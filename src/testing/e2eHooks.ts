@@ -33,6 +33,12 @@ export interface GameStateProbe {
     readonly x: number;
     readonly y: number;
   }[];
+  readonly salvage: readonly {
+    readonly id: number;
+    readonly x: number;
+    readonly y: number;
+    readonly remainingLifetime: number;
+  }[];
   readonly arena: {
     readonly width: number;
     readonly height: number;
@@ -110,6 +116,12 @@ function describe(session: GameSession): GameStateProbe {
       faction: projectile.faction,
       x: projectile.position.x,
       y: projectile.position.y,
+    })),
+    salvage: simulation.salvage.items.map((item) => ({
+      id: item.id,
+      x: item.position.x,
+      y: item.position.y,
+      remainingLifetime: item.remainingLifetime,
     })),
     arena: {
       width: arena.width,

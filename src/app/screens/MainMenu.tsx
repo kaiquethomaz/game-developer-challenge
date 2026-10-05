@@ -58,7 +58,8 @@ export function MainMenu({
         </dl>
         <p className="status-text">
           On touch screens, steer with the left buttons and fire with the right ones. Sink enemy
-          ships to score; a chaser that rams you does not count.
+          ships to score; a chaser that rams you does not count. Sunk ships may leave floating
+          salvage: sail over it to repair your hull.
         </p>
       </details>
 

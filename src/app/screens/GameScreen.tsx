@@ -371,6 +371,7 @@ function describeHudChange(before: HudSnapshot, hud: HudSnapshot): string | null
   ) {
     return `${hud.remainingSeconds} seconds left.`;
   }
+  if (hud.health > before.health) return `Hull repaired: ${hud.health} health.`;
   if (hud.health < before.health && hud.health <= hud.maxHealth * LOW_HEALTH_RATIO) {
     return `Hull critical: ${hud.health} health left.`;
   }
