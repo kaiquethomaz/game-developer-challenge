@@ -1,15 +1,25 @@
 :root {
+  --color-text: #f6ecd6;
+  --color-muted: #cfc6b2;
+  --color-gold: #ffd56b;
+  --color-gold-strong: #ffc53d;
+  --color-ink: #3b2208;
+  --color-danger: #ff9b8a;
+  --color-success: #a8e6a1;
+  --color-row: rgb(13 27 44 / 82%);
+  --color-row-highlight: rgb(122 104 52 / 70%);
+  --color-backdrop: rgb(6 18 30 / 55%);
+  --focus-ring: 0 0 0 3px #1b2a3a, 0 0 0 6px var(--color-gold-strong);
+  --font-body: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Arial Black', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+
   color-scheme: dark;
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
-  line-height: 1.5;
-  color: #f4ead5;
+  font-family: var(--font-body);
+  line-height: 1.45;
+  color: var(--color-text);
   background-color: #1b2a3a;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 *,
@@ -28,10 +38,60 @@ body,
 body {
   overflow: hidden;
   overscroll-behavior: none;
+  background:
+    linear-gradient(var(--color-backdrop), var(--color-backdrop)),
+    url('/assets/ui_scene_background.png') center / cover no-repeat,
+    #1b2a3a;
 }
 
-.app {
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.screen {
+  position: fixed;
+  inset: 0;
   display: grid;
   place-items: center;
-  height: 100%;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  overflow-y: auto;
+}
+
+.brand-mark {
+  position: fixed;
+  right: 20px;
+  bottom: 16px;
+  width: 120px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

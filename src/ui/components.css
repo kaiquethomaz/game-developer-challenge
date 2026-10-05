@@ -1,0 +1,192 @@
+.panel {
+  position: relative;
+  width: min(100%, var(--panel-width, 440px));
+  max-height: 100%;
+  border-style: solid;
+  border-width: 40px 32px;
+  border-image: url('/assets/png/retina/ui/menu/panel_menu.png') 80 64 fill / 40px 32px;
+  padding: 4px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  overflow: auto;
+}
+
+.panel--wide {
+  --panel-width: 860px;
+}
+
+.panel__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #fde9bf;
+  text-shadow:
+    0 2px 0 #6b3d10,
+    0 4px 10px rgb(0 0 0 / 45%);
+}
+
+.panel__subtitle {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  min-height: 60px;
+  padding: 0 28px;
+  border-style: solid;
+  border-width: 18px 40px;
+  border-image: url('/assets/png/retina/ui/menu/button_primary_normal.png') 36 80 fill / 18px 40px;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition:
+    transform 120ms ease-out,
+    filter 120ms ease-out;
+}
+
+.button > span {
+  margin: -18px -12px;
+}
+
+.button:hover:not(:disabled) {
+  border-image-source: url('/assets/png/retina/ui/menu/button_primary_hover.png');
+}
+
+.button:active:not(:disabled) {
+  border-image-source: url('/assets/png/retina/ui/menu/button_primary_pressed.png');
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  border-image-source: url('/assets/png/retina/ui/menu/button_primary_disabled.png');
+  color: #5c5546;
+  cursor: not-allowed;
+}
+
+.button--secondary {
+  border-image-source: url('/assets/png/retina/ui/menu/button_secondary_normal.png');
+  color: var(--color-text);
+}
+
+.button--secondary:hover:not(:disabled) {
+  border-image-source: url('/assets/png/retina/ui/menu/button_secondary_normal.png');
+  filter: brightness(1.15);
+}
+
+.button--secondary:active:not(:disabled) {
+  border-image-source: url('/assets/png/retina/ui/menu/button_secondary_pressed.png');
+}
+
+.button--small {
+  min-width: 160px;
+  min-height: 48px;
+  font-size: 0.9rem;
+  border-width: 14px 32px;
+  border-image-width: 14px 32px;
+}
+
+.button--small > span {
+  margin: -14px -8px;
+}
+
+.round-button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--round-size, 56px);
+  height: var(--round-size, 56px);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: url('/assets/png/retina/ui/controls/button_round_normal.png') center / contain
+    no-repeat;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.round-button:hover:not(:disabled) {
+  background-image: url('/assets/png/retina/ui/controls/button_round_hover.png');
+}
+
+.round-button:active:not(:disabled),
+.round-button[data-pressed='true'] {
+  background-image: url('/assets/png/retina/ui/controls/button_round_pressed.png');
+}
+
+.round-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.round-button img {
+  width: 50%;
+  height: 50%;
+  pointer-events: none;
+}
+
+.dialog {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow: visible;
+}
+
+.dialog::backdrop {
+  background: rgb(6 18 30 / 55%);
+}
+
+.alert {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgb(120 30 20 / 55%);
+  color: #ffe1da;
+  font-weight: 700;
+}
+
+.status-text {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.button-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.button:focus-visible,
+.round-button:focus-visible {
+  border-radius: 999px;
+}
