@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import type { MatchSubmission } from './api/contracts';
 import { useMatchSync } from './api/queries';
 import type { LogTab } from './app/screens/CaptainsLog';
 import { CaptainsLog } from './app/screens/CaptainsLog';
-import { GameScreen } from './app/screens/GameScreen';
 import { MainMenu } from './app/screens/MainMenu';
 import { NetworkLab } from './app/screens/NetworkLab';
 import { OptionsPanel } from './app/screens/OptionsPanel';
@@ -21,9 +20,17 @@ import {
   saveSoundEnabled,
   type PlayerProfile,
 } from './storage/settings';
+import { Button } from './ui/Button';
 import { Dialog } from './ui/Dialog';
+import { ErrorBoundary } from './ui/ErrorBoundary';
 import './ui/components.css';
 import './app/screens.css';
+
+function lazyGameScreen() {
+  return lazy(() =>
+    import('./app/screens/GameScreen').then((module) => ({ default: module.GameScreen })),
+  );
+}
 
 type Screen =
   | { readonly name: 'menu' }
@@ -41,6 +48,7 @@ export function App() {
   const [screen, setScreen] = useState<Screen>(() => initialScreen(lastResult !== null));
   const [networkLabOpen, setNetworkLabOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(loadSoundEnabled);
+  const [GameScreen, setGameScreen] = useState(lazyGameScreen);
   const { submit, retryAll } = useMatchSync();
 
   useEffect(() => {
@@ -85,7 +93,7 @@ export function App() {
     (outcome: MatchOutcome) => {
       saveLastResult(outcome);
       setLastResult(outcome);
-      submit(toSubmission(outcome, profile));
+      if (!outcome.assisted) submit(toSubmission(outcome, profile));
     },
     [profile, submit],
   );
@@ -97,17 +105,31 @@ export function App() {
   return (
     <>
       {screen.name === 'game' ? (
-        <GameScreen
-          key={screen.run}
-          options={options}
-          profile={profile}
-          onSaveOptions={handleSaveOptions}
-          soundEnabled={soundEnabled}
-          onSoundChange={handleSoundChange}
-          onMatchEnd={handleMatchEnd}
-          onShowResult={showResult}
-          onExit={goToMenu}
-        />
+        <ErrorBoundary
+          fallback={(retry) => (
+            <BattleLoadError
+              onRetry={() => {
+                setGameScreen(lazyGameScreen);
+                retry();
+              }}
+              onExit={goToMenu}
+            />
+          )}
+        >
+          <Suspense fallback={<BattleFallback />}>
+            <GameScreen
+              key={screen.run}
+              options={options}
+              profile={profile}
+              onSaveOptions={handleSaveOptions}
+              soundEnabled={soundEnabled}
+              onSoundChange={handleSoundChange}
+              onMatchEnd={handleMatchEnd}
+              onShowResult={showResult}
+              onExit={goToMenu}
+            />
+          </Suspense>
+        </ErrorBoundary>
       ) : (
         <main className="screen">
           {screen.name === 'menu' && (
@@ -170,6 +192,39 @@ export function App() {
         />
       </Dialog>
     </>
+  );
+}
+
+function BattleFallback() {
+  return (
+    <div className="screen">
+      <p className="status-text" role="status">
+        Preparing the battle…
+      </p>
+    </div>
+  );
+}
+
+function BattleLoadError({ onRetry, onExit }: { onRetry: () => void; onExit: () => void }) {
+  return (
+    <div className="screen">
+      <section className="panel" aria-labelledby="battle-error-title">
+        <h1 className="panel__title" id="battle-error-title">
+          Stuck in port
+        </h1>
+        <p className="alert" role="alert">
+          The battle could not start. Check your connection and try again.
+        </p>
+        <div className="button-stack">
+          <Button onClick={onRetry} autoFocus>
+            Try again
+          </Button>
+          <Button variant="secondary" onClick={onExit}>
+            Main menu
+          </Button>
+        </div>
+      </section>
+    </div>
   );
 }
 

@@ -58,14 +58,19 @@ export class GameRenderer {
     options: RendererOptions,
   ): Promise<GameRenderer> {
     const app = new Application();
-    await app.init({
-      resizeTo: host,
-      background: BACKGROUND_COLOR,
-      antialias: true,
-      autoDensity: true,
-      resolution: Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO),
-      preference: 'webgl',
-    });
+    try {
+      await app.init({
+        resizeTo: host,
+        background: BACKGROUND_COLOR,
+        antialias: true,
+        autoDensity: true,
+        resolution: Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO),
+        preference: 'webgl',
+      });
+    } catch (error) {
+      app.destroy();
+      throw error;
+    }
     app.canvas.setAttribute('aria-hidden', 'true');
     host.appendChild(app.canvas);
 

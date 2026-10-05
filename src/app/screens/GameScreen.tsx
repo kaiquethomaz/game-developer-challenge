@@ -13,6 +13,7 @@ import { Button, RoundButton } from '../../ui/Button';
 import { Dialog } from '../../ui/Dialog';
 import { useMediaQuery } from '../../ui/useMediaQuery';
 import { useBattleAudio } from '../../game/audio/useBattleAudio';
+import { ANNOUNCED_SECONDS_LEFT, LOW_HEALTH_RATIO } from '../../game/session/alerts';
 import { endReasonLabel, formatClock } from '../format';
 import { OptionsPanel } from './OptionsPanel';
 
@@ -96,6 +97,7 @@ function Battle({
   const { options } = overlayProps;
   const hostRef = useRef<HTMLDivElement>(null);
   const [session, setSession] = useState<GameSession | null>(null);
+  const [mountFailed, setMountFailed] = useState(false);
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const notifyMatchEnd = useEffectEvent((outcome: MatchOutcome) => {
     onMatchEnd(outcome);
@@ -130,7 +132,8 @@ function Battle({
         setSession(next);
       })
       .catch((error: unknown) => {
-        console.error('Failed to start the battle renderer', error);
+        console.warn('Failed to start the battle renderer', error);
+        if (!next.isDisposed) setMountFailed(true);
       });
 
     return () => {
@@ -139,6 +142,24 @@ function Battle({
       setSession(null);
     };
   }, [textures]);
+
+  if (mountFailed) {
+    return (
+      <div className="screen">
+        <section className="panel" aria-labelledby="renderer-error-title">
+          <h1 className="panel__title" id="renderer-error-title">
+            Stuck in port
+          </h1>
+          <p className="alert" role="alert">
+            Your browser could not start the battle graphics. Make sure WebGL is enabled.
+          </p>
+          <Button onClick={overlayProps.onExit} autoFocus>
+            Main menu
+          </Button>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="battle">
@@ -317,8 +338,6 @@ function Hud({ hud, onPause }: { hud: HudSnapshot; onPause: () => void }) {
   );
 }
 
-const ANNOUNCED_SECONDS = new Set([60, 30, 10]);
-
 function BattleAnnouncer({ hud }: { hud: HudSnapshot }) {
   const [previous, setPrevious] = useState(hud);
   const [message, setMessage] = useState('Battle started.');
@@ -348,11 +367,11 @@ function describeHudChange(before: HudSnapshot, hud: HudSnapshot): string | null
   if (hud.score !== before.score) return `Enemy sunk. Score ${hud.score}.`;
   if (
     hud.remainingSeconds !== before.remainingSeconds &&
-    ANNOUNCED_SECONDS.has(hud.remainingSeconds)
+    ANNOUNCED_SECONDS_LEFT.has(hud.remainingSeconds)
   ) {
     return `${hud.remainingSeconds} seconds left.`;
   }
-  if (hud.health < before.health && hud.health <= hud.maxHealth * 0.25) {
+  if (hud.health < before.health && hud.health <= hud.maxHealth * LOW_HEALTH_RATIO) {
     return `Hull critical: ${hud.health} health left.`;
   }
   return null;
