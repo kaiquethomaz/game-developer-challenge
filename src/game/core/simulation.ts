@@ -13,6 +13,8 @@ import { fireBroadside, fireFront, tickCooldowns, type ShotOrigin } from './weap
 
 export type MatchStatus = 'running' | 'ended';
 
+const TIME_EPSILON = 1e-6;
+
 export interface SimulationState {
   elapsedSeconds: number;
   status: MatchStatus;
@@ -71,6 +73,11 @@ export class Simulation {
     this.resolveShipContacts();
     this.updateProjectiles(dt);
     this.removeDestroyedEnemies();
+
+    if (this.state.elapsedSeconds >= this.config.matchDurationSeconds - TIME_EPSILON) {
+      this.state.elapsedSeconds = this.config.matchDurationSeconds;
+      this.end('time');
+    }
   }
 
   spawnEnemy(kind: EnemyKind, position: Vec2, heading: number): Ship {
