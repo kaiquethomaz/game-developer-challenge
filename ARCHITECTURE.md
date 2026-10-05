@@ -25,7 +25,7 @@ React owns the screens and everything that is a form, a panel or a dialog. PixiJ
 
 `GameScreen` loads the textures, then mounts a `GameSession` into a host `div` from a `useEffect`. The session creates the Pixi `Application` asynchronously, so the effect cleanup can run before the renderer exists. `GameSession.destroy()` marks the session disposed, and `mount()` destroys the freshly created renderer if it finishes after disposal. This keeps init and teardown correct under React Strict Mode's double mount (verified in dev mode) and when the player leaves while the canvas is still starting.
 
-The continuous state of combat never lives in React. The session publishes a small `HudSnapshot` (status, pause reason, score, whole seconds left, health) to an external `HudStore`, read with `useSyncExternalStore`. The store compares snapshots field by field and only notifies listeners when something visible changed, so React renders a few times per second at most, never once per frame. A polite live region describes meaningful changes (pause, resume, enemy sunk, 60/30/10 seconds left, critical hull, end of battle) instead of mirroring every update.
+The continuous state of combat never lives in React. The session publishes a small `HudSnapshot` (status, pause reason, score, whole seconds left, health, volley readiness) to an external `HudStore`, read with `useSyncExternalStore`. The store compares snapshots field by field and only notifies listeners when something visible changed (the volley gauge only flips between ready and reloading; its fill is a CSS animation that pauses with the game), so React renders a few times per second at most, never once per frame. A polite live region describes meaningful changes (pause, resume, enemy sunk, 60/30/10 seconds left, critical hull, end of battle) instead of mirroring every update.
 
 ## Simulation loop
 
@@ -41,7 +41,7 @@ Pausing (manual, `blur` or `visibilitychange`) stops feeding the accumulator, re
 
 ### Rules
 
-- The player sails forward with acceleration and rotates both ways. The front cannon fires one projectile; each broadside fires three parallel projectiles offset along the hull. Every weapon has its own cooldown.
+- The player sails forward with acceleration and rotates both ways. The front cannon fires one projectile; each broadside fires three parallel projectiles offset along the hull; the triple volley is a special weapon that fans three projectiles around the bow on a long reload. Every weapon has its own cooldown.
 - Projectiles move with constant velocity, expire after their range or lifetime, stop at islands and arena edges, and apply damage once to the first opposing ship they overlap.
 - A chaser that touches the player deals contact damage and explodes without scoring. Only enemies destroyed by player projectiles add one point.
 - The match ends exactly at the configured duration or when health reaches zero, emitting a single `ended` event.
@@ -149,18 +149,19 @@ MSW handlers (`src/mocks/handlers.ts`) run in the browser in development, in the
 
 ## Balancing decisions
 
-| Decision                                                         | Reason                                                                                                                                 |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Front cannon: 25 damage, 0.45 s cooldown, 560 px range           | Precise and quick, rewards aiming.                                                                                                     |
-| Broadsides: three 20 damage balls, 1.2 s cooldown, 380 px range  | Strong at close range but slow, so they reward positioning alongside enemies.                                                          |
-| Chaser: 40 health                                                | Sunk by two front shots or one broadside.                                                                                              |
-| Shooter: 60 health                                               | Needs three front shots, more attention than a chaser.                                                                                 |
-| Shooter cannon: 8 damage, 1.8 s cooldown                         | Lowered from 10 damage and 1.6 s after profiling showed a single shooter sank a stationary ship in about 18 s.                         |
-| Spawn distance 520 px                                            | Greater than the 420 px shooter attack range, so no enemy can deal damage on arrival.                                                  |
-| First two spawns: one chaser, one shooter                        | Guarantees both enemy types in every match. After that, spawns follow a weighted distribution.                                         |
-| Enemies alive capped from 4 to 10 over the match                 | Early battles are learnable; late battles are busy without becoming a wall of ships. A spawn tick is skipped while the cap is reached. |
-| Enemy mix from 60/40 to 40/60 chasers to shooters                | Late battles reward positioning and broadsides rather than only kiting chasers.                                                        |
-| Repair salvage: 20 health, 35% drop (70% at half health or less) | A way to recover by playing aggressively, which counters the rising pressure without making the player immune.                         |
+| Decision                                                                 | Reason                                                                                                                                 |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Front cannon: 25 damage, 0.45 s cooldown, 560 px range                   | Precise and quick, rewards aiming.                                                                                                     |
+| Broadsides: three 20 damage balls, 1.2 s cooldown, 380 px range          | Strong at close range but slow, so they reward positioning alongside enemies.                                                          |
+| Triple volley: three 25 damage balls fanned 0.24 rad apart, 6 s cooldown | A burst for emergencies that rewards aiming at groups; the long reload keeps the front cannon the main weapon.                         |
+| Chaser: 40 health                                                        | Sunk by two front shots or one broadside.                                                                                              |
+| Shooter: 60 health                                                       | Needs three front shots, more attention than a chaser.                                                                                 |
+| Shooter cannon: 8 damage, 1.8 s cooldown                                 | Lowered from 10 damage and 1.6 s after profiling showed a single shooter sank a stationary ship in about 18 s.                         |
+| Spawn distance 520 px                                                    | Greater than the 420 px shooter attack range, so no enemy can deal damage on arrival.                                                  |
+| First two spawns: one chaser, one shooter                                | Guarantees both enemy types in every match. After that, spawns follow a weighted distribution.                                         |
+| Enemies alive capped from 4 to 10 over the match                         | Early battles are learnable; late battles are busy without becoming a wall of ships. A spawn tick is skipped while the cap is reached. |
+| Enemy mix from 60/40 to 40/60 chasers to shooters                        | Late battles reward positioning and broadsides rather than only kiting chasers.                                                        |
+| Repair salvage: 20 health, 35% drop (70% at half health or less)         | A way to recover by playing aggressively, which counters the rising pressure without making the player immune.                         |
 
 ## Limitations
 
