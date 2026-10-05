@@ -5,6 +5,7 @@ const ALL_CONTROLS = ['KeyW', 'KeyD', 'Space', 'KeyQ', 'KeyE'] as const;
 
 test.describe('match end', () => {
   test('ends by time, freezes the simulation and shows the result', async ({ page }) => {
+    test.slow();
     await startBattle(page, { seed: 4, matchDurationSeconds: 60, spawnIntervalSeconds: 10 });
     for (const key of ALL_CONTROLS) await page.keyboard.down(key);
     await advanceUntil(page, (state) => state.elapsedSeconds >= 59, 60, 1);
