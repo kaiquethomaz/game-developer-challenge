@@ -1,0 +1,10 @@
+dist
+node_modules
+public
+playwright-report
+test-results
+package-lock.json
+assets
+CLAUDE.md
+CHALLENGE.md
+.claude
