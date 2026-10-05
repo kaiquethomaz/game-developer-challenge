@@ -15,6 +15,8 @@ interface OptionsPanelProps {
   readonly titleId: string;
   readonly note?: string;
   readonly onSave: (options: PlayerOptions, captainName: string) => boolean;
+  readonly soundEnabled: boolean;
+  readonly onSoundChange: (enabled: boolean) => void;
   readonly onClose: () => void;
   readonly closeLabel: string;
 }
@@ -25,6 +27,8 @@ export function OptionsPanel({
   titleId,
   note,
   onSave,
+  soundEnabled,
+  onSoundChange,
   onClose,
   closeLabel,
 }: OptionsPanelProps) {
@@ -103,6 +107,16 @@ export function OptionsPanel({
             update('captainName', value);
           }}
         />
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={soundEnabled}
+            onChange={(event) => {
+              onSoundChange(event.target.checked);
+            }}
+          />
+          <span>Sound effects</span>
+        </label>
         <p className="status-text" role="status">
           {status}
         </p>

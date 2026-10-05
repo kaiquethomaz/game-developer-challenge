@@ -12,6 +12,7 @@ import { exposeSession, readE2EOptions } from '../../testing/e2eHooks';
 import { Button, RoundButton } from '../../ui/Button';
 import { Dialog } from '../../ui/Dialog';
 import { useMediaQuery } from '../../ui/useMediaQuery';
+import { useBattleAudio } from '../../game/audio/useBattleAudio';
 import { endReasonLabel, formatClock } from '../format';
 import { OptionsPanel } from './OptionsPanel';
 
@@ -21,6 +22,8 @@ interface GameScreenProps {
   readonly options: PlayerOptions;
   readonly profile: PlayerProfile;
   readonly onSaveOptions: (options: PlayerOptions, captainName: string) => boolean;
+  readonly soundEnabled: boolean;
+  readonly onSoundChange: (enabled: boolean) => void;
   readonly onMatchEnd: (outcome: MatchOutcome) => void;
   readonly onShowResult: () => void;
   readonly onExit: () => void;
@@ -83,15 +86,14 @@ export function GameScreen(props: GameScreenProps) {
   return <Battle {...props} textures={textures.textures} />;
 }
 
+type OverlayProps = Omit<GameScreenProps, 'onMatchEnd'>;
+
 function Battle({
   textures,
-  options,
-  profile,
-  onSaveOptions,
   onMatchEnd,
-  onShowResult,
-  onExit,
+  ...overlayProps
 }: GameScreenProps & { textures: GameTextures }) {
+  const { options } = overlayProps;
   const hostRef = useRef<HTMLDivElement>(null);
   const [session, setSession] = useState<GameSession | null>(null);
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
@@ -144,16 +146,7 @@ function Battle({
         <img src="/assets/png/retina/ui/controls/icon_restart.png" alt="" width={48} height={48} />
         <p>Rotate your device to landscape to play.</p>
       </div>
-      {session && (
-        <BattleOverlay
-          session={session}
-          profile={profile}
-          options={options}
-          onSaveOptions={onSaveOptions}
-          onShowResult={onShowResult}
-          onExit={onExit}
-        />
-      )}
+      {session && <BattleOverlay session={session} {...overlayProps} />}
     </div>
   );
 }
@@ -163,17 +156,13 @@ function BattleOverlay({
   profile,
   options,
   onSaveOptions,
+  soundEnabled,
+  onSoundChange,
   onShowResult,
   onExit,
-}: {
-  session: GameSession;
-  profile: PlayerProfile;
-  options: PlayerOptions;
-  onSaveOptions: (options: PlayerOptions, captainName: string) => boolean;
-  onShowResult: () => void;
-  onExit: () => void;
-}) {
+}: OverlayProps & { session: GameSession }) {
   const hud = useSyncExternalStore(session.hud.subscribe, session.hud.getSnapshot);
+  useBattleAudio(session, hud);
   const [showOptions, setShowOptions] = useState(false);
   const isCoarsePointer = useMediaQuery('(pointer: coarse)');
   const showTouch = isCoarsePointer || new URLSearchParams(window.location.search).has('touch');
@@ -225,6 +214,8 @@ function BattleOverlay({
             profile={profile}
             note="Changes apply to your next battle."
             onSave={onSaveOptions}
+            soundEnabled={soundEnabled}
+            onSoundChange={onSoundChange}
             onClose={() => {
               setShowOptions(false);
             }}

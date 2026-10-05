@@ -3,6 +3,7 @@ import { isRecord, readJson, writeJson } from './localStore';
 
 const OPTIONS_KEY = 'pirate-battle:options';
 const PROFILE_KEY = 'pirate-battle:profile';
+const SOUND_KEY = 'pirate-battle:sound';
 
 export const CAPTAIN_NAME_LIMITS = { min: 2, max: 20 } as const;
 
@@ -34,6 +35,14 @@ export function loadProfile(): PlayerProfile {
   const profile: PlayerProfile = { playerId: crypto.randomUUID(), captainName: 'Captain You' };
   writeJson(PROFILE_KEY, profile);
   return profile;
+}
+
+export function loadSoundEnabled(): boolean {
+  return readJson(SOUND_KEY, (value) => (typeof value === 'boolean' ? value : null)) ?? true;
+}
+
+export function saveSoundEnabled(enabled: boolean): void {
+  writeJson(SOUND_KEY, enabled);
 }
 
 export function saveProfile(profile: PlayerProfile): boolean {

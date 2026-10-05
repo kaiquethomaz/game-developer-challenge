@@ -516,3 +516,17 @@ kbd {
     transform: translateY(-28px);
   }
 }
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toggle input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-gold-strong);
+}

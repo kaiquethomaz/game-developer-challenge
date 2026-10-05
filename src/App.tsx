@@ -8,6 +8,7 @@ import { MainMenu } from './app/screens/MainMenu';
 import { NetworkLab } from './app/screens/NetworkLab';
 import { OptionsPanel } from './app/screens/OptionsPanel';
 import { ResultScreen } from './app/screens/ResultScreen';
+import { audio } from './game/audio/AudioManager';
 import type { PlayerOptions } from './game/config';
 import type { MatchOutcome } from './game/session/GameSession';
 import { loadLastResult, saveLastResult } from './storage/lastResult';
@@ -16,6 +17,8 @@ import {
   loadProfile,
   saveOptions,
   saveProfile,
+  loadSoundEnabled,
+  saveSoundEnabled,
   type PlayerProfile,
 } from './storage/settings';
 import { Dialog } from './ui/Dialog';
@@ -37,11 +40,21 @@ export function App() {
   const [lastResult, setLastResult] = useState<MatchOutcome | null>(loadLastResult);
   const [screen, setScreen] = useState<Screen>(() => initialScreen(lastResult !== null));
   const [networkLabOpen, setNetworkLabOpen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(loadSoundEnabled);
   const { submit, retryAll } = useMatchSync();
 
   useEffect(() => {
     retryAll();
   }, [retryAll]);
+
+  useEffect(() => {
+    audio.setEnabled(soundEnabled);
+  }, [soundEnabled]);
+
+  const handleSoundChange = useCallback((enabled: boolean) => {
+    saveSoundEnabled(enabled);
+    setSoundEnabled(enabled);
+  }, []);
 
   useEffect(() => {
     rememberScreen(screen.name === 'result' ? 'result' : null);
@@ -53,6 +66,7 @@ export function App() {
   }, []);
 
   const startGame = useCallback(() => {
+    audio.unlock();
     setScreen((current) => ({ name: 'game', run: current.name === 'game' ? current.run + 1 : 1 }));
   }, []);
 
@@ -88,6 +102,8 @@ export function App() {
           options={options}
           profile={profile}
           onSaveOptions={handleSaveOptions}
+          soundEnabled={soundEnabled}
+          onSoundChange={handleSoundChange}
           onMatchEnd={handleMatchEnd}
           onShowResult={showResult}
           onExit={goToMenu}
@@ -115,6 +131,8 @@ export function App() {
               options={options}
               profile={profile}
               onSave={handleSaveOptions}
+              soundEnabled={soundEnabled}
+              onSoundChange={handleSoundChange}
               onClose={goToMenu}
               closeLabel="Main menu"
             />
