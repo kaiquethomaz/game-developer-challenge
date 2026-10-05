@@ -9,7 +9,7 @@ export default defineConfig({
     '{testDir}/__screenshots__/{platform}/{projectName}/{testFilePath}/{arg}{ext}',
   fullyParallel: true,
   workers: 2,
-  timeout: 60_000,
+  timeout: process.env.CI ? 120_000 : 60_000,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: [['html', { open: 'never' }], ['list']],
