@@ -1,0 +1,5 @@
+/mockServiceWorker.js
+  Cache-Control: no-cache
+
+/assets/*
+  Cache-Control: public, max-age=86400

@@ -207,7 +207,12 @@ Font rendering differs between operating systems, so visual baselines are versio
 
 **Live demo:** _add the Vercel URL here after the first deploy_
 
-The app is a static Vite build. On Vercel, import the repository with the default Vite preset (build `npm run build`, output `dist`). `vercel.json` keeps the mock service worker uncached so new deployments pick up handler changes. The mock API runs in the deployed build, so the game works when opening or reloading the public URL.
+The app is a static Vite build (build command `npm run build`, output directory `dist`) and runs on any static host:
+
+- **Cloudflare Pages:** create a Pages project connected to the repository with the Vite preset. The Node version comes from `.nvmrc`, and `public/_headers` keeps the mock service worker uncached and caches the game assets.
+- **Vercel:** import the repository with the default Vite preset. `vercel.json` applies the same cache rules.
+
+Keeping the mock service worker uncached lets new deployments pick up handler changes. The mock API runs in the deployed build, so the game works when opening or reloading the public URL.
 
 ## Assets and licenses
 
