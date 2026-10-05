@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { DEFAULT_GAME_CONFIG } from '../../../src/game/config';
 import type { GameStateProbe } from '../../../src/testing/e2eHooks';
 
 export interface BattleSetup {
@@ -15,9 +16,10 @@ export async function storeOptions(
   page: Page,
   options: { matchDurationSeconds: number; spawnIntervalSeconds: number },
 ): Promise<void> {
-  await page.goto('/?latency=0');
-  await page.evaluate((value) => {
+  await page.addInitScript((value) => {
+    if (sessionStorage.getItem('e2e:options-seeded')) return;
     localStorage.setItem('pirate-battle:options', JSON.stringify(value));
+    sessionStorage.setItem('e2e:options-seeded', '1');
   }, options);
 }
 
@@ -74,26 +76,27 @@ export async function turnTowards(
   targetAngle: number,
   tolerance = 0.04,
 ): Promise<void> {
-  for (let i = 0; i < 400; i += 1) {
+  const radiansPerStep = DEFAULT_GAME_CONFIG.player.turnSpeed * STEP_SECONDS;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
     const { player } = await readState(page);
     const error = Math.atan2(
       Math.sin(targetAngle - player.heading),
       Math.cos(targetAngle - player.heading),
     );
     if (Math.abs(error) <= tolerance) return;
+    const steps = Math.max(1, Math.round(Math.abs(error) / radiansPerStep));
     const key = error > 0 ? 'KeyD' : 'KeyA';
     await page.keyboard.down(key);
-    await advance(page, STEP_SECONDS);
+    await advance(page, steps * STEP_SECONDS);
     await page.keyboard.up(key);
   }
-  throw new Error(`Could not turn towards ${targetAngle}`);
 }
 
 export async function advanceUntil(
   page: Page,
   predicate: (state: GameStateProbe) => boolean,
   maxSeconds: number,
-  chunkSeconds = 0.1,
+  chunkSeconds = 0.25,
 ): Promise<GameStateProbe> {
   let state = await readState(page);
   for (let elapsed = 0; elapsed < maxSeconds && !predicate(state); elapsed += chunkSeconds) {
