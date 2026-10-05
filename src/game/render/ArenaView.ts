@@ -44,16 +44,24 @@ const SHIMMER_SPEED = { x: 9, y: 5 } as const;
 const SHIMMER_SCALE = 1.6;
 
 export class ArenaView extends Container {
-  private readonly shimmer: TilingSprite;
+  private readonly shimmer: TilingSprite | null = null;
 
   constructor(
     arena: Arena,
     islands: readonly TileRect[],
     textures: GameTextures,
-    private readonly animate: boolean,
+    animate: boolean,
   ) {
     super({ label: 'arena' });
     const water = createWater(arena, textures);
+    const land = createLand(arena, islands, textures);
+
+    if (!animate) {
+      this.addChild(water, land);
+      this.cacheAsTexture(true);
+      return;
+    }
+
     this.shimmer = new TilingSprite({
       texture: textures.tile(WATER_TILE),
       width: arena.width,
@@ -61,12 +69,13 @@ export class ArenaView extends Container {
       alpha: SHIMMER_ALPHA,
       tileScale: { x: SHIMMER_SCALE, y: SHIMMER_SCALE },
     });
-    const land = createLand(arena, islands, textures);
+    water.cacheAsTexture(true);
+    land.cacheAsTexture(true);
     this.addChild(water, this.shimmer, land);
   }
 
   update(dt: number): void {
-    if (!this.animate) return;
+    if (!this.shimmer) return;
     this.shimmer.tilePosition.x += SHIMMER_SPEED.x * dt;
     this.shimmer.tilePosition.y += SHIMMER_SPEED.y * dt;
   }
@@ -80,7 +89,6 @@ function createWater(arena: Arena, textures: GameTextures): Container {
       water.addChild(createTile(textures, WATER_TILE, col, row, size));
     }
   }
-  water.cacheAsTexture(true);
   return water;
 }
 
@@ -140,7 +148,6 @@ function createLand(arena: Arena, islands: readonly TileRect[], textures: GameTe
       .rect(0, 0, arena.width, arena.height)
       .stroke({ width: 4, color: 0x0b3954, alpha: 0.6 }),
   );
-  land.cacheAsTexture(true);
   return land;
 }
 
