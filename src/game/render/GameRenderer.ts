@@ -113,7 +113,7 @@ export class GameRenderer {
     return {
       ships: this.shipViews.size,
       projectiles: this.simulation.projectiles.active.length,
-      effects: this.effects.activeCount,
+      effects: this.effects.activeCount + this.wakeLayer.activeCount,
     };
   }
 
