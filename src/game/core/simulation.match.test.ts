@@ -87,6 +87,23 @@ describe('match rules', () => {
     expect(simulation.drainEvents()).toEqual([]);
   });
 
+  it('emits nothing after the ended event within the final step', () => {
+    const simulation = new Simulation(
+      { ...DEFAULT_GAME_CONFIG, spawn: { ...DEFAULT_GAME_CONFIG.spawn, initialDelaySeconds: 1e9 } },
+      1,
+    );
+    const { player } = simulation.state;
+    player.health = 1;
+    simulation.step(STEP, { ...createIdleIntent(), fireFront: true });
+    simulation.spawnEnemy('chaser', { x: player.position.x - 40, y: player.position.y }, 0);
+    simulation.drainEvents();
+
+    simulation.step(STEP, createIdleIntent());
+    const events = simulation.drainEvents();
+    expect(events.at(-1)).toEqual({ type: 'ended', reason: 'death' });
+    expect(simulation.state.score).toBe(0);
+  });
+
   it('emits a single ended event', () => {
     const simulation = new Simulation(
       createMatchConfig({ ...DEFAULT_PLAYER_OPTIONS, matchDurationSeconds: 60 }),

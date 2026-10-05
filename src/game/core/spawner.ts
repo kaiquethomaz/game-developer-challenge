@@ -4,9 +4,6 @@ import type { EnemyKind, Ship } from './entities';
 import { distanceSquared, type Vec2 } from './math';
 import type { Random } from './random';
 
-const RANDOM_ATTEMPTS = 48;
-const SPAWN_PADDING = 8;
-
 export class EnemySpawner {
   private timer: number;
   private readonly spawned: Record<EnemyKind, number> = { chaser: 0, shooter: 0 };
@@ -28,10 +25,11 @@ export class EnemySpawner {
 
     this.timer += this.config.intervalSeconds;
     if (aliveCount >= this.config.maxAlive) return null;
+    return this.chooseKind();
+  }
 
-    const kind = this.chooseKind();
+  confirm(kind: EnemyKind): void {
     this.spawned[kind] += 1;
-    return kind;
   }
 
   private chooseKind(): EnemyKind {
@@ -49,20 +47,21 @@ export function findSpawnPoint(
   player: Ship,
   enemies: readonly Ship[],
   radius: number,
-  minDistanceFromPlayer: number,
+  config: SpawnConfig,
   random: Random,
 ): Vec2 | null {
+  const { clearance, candidateAttempts, minDistanceFromPlayer } = config;
   const isFree = (point: Vec2): boolean =>
-    !arena.isCircleBlocked(point, radius + SPAWN_PADDING) &&
+    !arena.isCircleBlocked(point, radius + clearance) &&
     enemies.every((enemy) => {
-      const reach = enemy.radius + radius + SPAWN_PADDING;
+      const reach = enemy.radius + radius + clearance;
       return distanceSquared(enemy.position, point) >= reach * reach;
     });
 
   const minimumSquared = minDistanceFromPlayer * minDistanceFromPlayer;
-  const margin = radius + SPAWN_PADDING;
+  const margin = radius + clearance;
 
-  for (let attempt = 0; attempt < RANDOM_ATTEMPTS; attempt += 1) {
+  for (let attempt = 0; attempt < candidateAttempts; attempt += 1) {
     const candidate = {
       x: random.range(margin, arena.width - margin),
       y: random.range(margin, arena.height - margin),
@@ -79,7 +78,11 @@ export function findSpawnPoint(
     for (let x = margin; x <= arena.width - margin; x += step) {
       const candidate = { x, y };
       const candidateDistance = distanceSquared(candidate, player.position);
-      if (candidateDistance > farthestDistance && isFree(candidate)) {
+      if (
+        candidateDistance >= minimumSquared &&
+        candidateDistance > farthestDistance &&
+        isFree(candidate)
+      ) {
         farthest = candidate;
         farthestDistance = candidateDistance;
       }

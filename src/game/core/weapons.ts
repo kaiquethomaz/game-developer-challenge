@@ -45,7 +45,7 @@ export function fireBroadside(
   const sideY = Math.sin(angle);
   const alongX = Math.cos(ship.heading);
   const alongY = Math.sin(ship.heading);
-  const sideOffset = ship.radius * 0.6 + weapon.projectileRadius;
+  const sideOffset = ship.radius * weapon.sideOffsetRatio + weapon.projectileRadius;
   const centerIndex = (weapon.projectileCount - 1) / 2;
 
   for (let i = 0; i < weapon.projectileCount; i += 1) {

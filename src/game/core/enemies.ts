@@ -1,4 +1,4 @@
-import type { ShipMovementConfig, ShooterConfig } from '../config';
+import type { EnemySteeringConfig, ShooterConfig } from '../config';
 import type { Arena } from './arena';
 import type { Ship } from './entities';
 import { angleTo, clamp, distance, wrapAngle, type Vec2 } from './math';
@@ -23,7 +23,7 @@ export function chooseSteeringTarget(ship: Ship, context: SteeringContext): Vec2
 
 export function steerTowards(
   ship: Ship,
-  config: ShipMovementConfig,
+  config: EnemySteeringConfig,
   arena: Arena,
   target: Vec2,
   throttle: number,
@@ -31,14 +31,14 @@ export function steerTowards(
 ): number {
   const error = wrapAngle(angleTo(ship.position, target) - ship.heading);
   const turn = clamp(error / Math.max(config.turnSpeed * dt, Number.EPSILON), -1, 1);
-  const sharpTurnFactor = Math.abs(error) > Math.PI / 2 ? 0.4 : 1;
+  const sharpTurnFactor = Math.abs(error) > config.sharpTurnRadians ? config.sharpTurnThrottle : 1;
   moveShip(ship, config, arena, throttle * sharpTurnFactor, turn, dt);
   return error;
 }
 
 export function updateChaser(
   ship: Ship,
-  config: ShipMovementConfig,
+  config: EnemySteeringConfig,
   context: SteeringContext,
   dt: number,
 ): void {
@@ -53,11 +53,19 @@ export function updateShooter(
 ): boolean {
   const { arena, player } = context;
   const range = distance(ship.position, player.position);
-  const hasLineOfSight = arena.hasLineOfSight(ship.position, player.position, 4);
+  const hasLineOfSight = arena.hasLineOfSight(
+    ship.position,
+    player.position,
+    config.lineOfSightRadius,
+  );
 
   if (!hasLineOfSight || range > config.preferredRange) {
     const slowdown = hasLineOfSight
-      ? clamp((range - config.preferredRange) / config.preferredRange + 0.35, 0.35, 1)
+      ? clamp(
+          (range - config.preferredRange) / config.preferredRange + config.minApproachThrottle,
+          config.minApproachThrottle,
+          1,
+        )
       : 1;
     steerTowards(ship, config, arena, chooseSteeringTarget(ship, context), slowdown, dt);
   } else {

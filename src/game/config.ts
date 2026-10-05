@@ -17,6 +17,7 @@ export interface WeaponConfig {
 export interface BroadsideConfig extends WeaponConfig {
   readonly projectileCount: number;
   readonly spacing: number;
+  readonly sideOffsetRatio: number;
 }
 
 export interface ShipMovementConfig {
@@ -26,6 +27,12 @@ export interface ShipMovementConfig {
   readonly acceleration: number;
   readonly deceleration: number;
   readonly turnSpeed: number;
+  readonly collisionSpeedFactor: number;
+}
+
+export interface EnemySteeringConfig extends ShipMovementConfig {
+  readonly sharpTurnRadians: number;
+  readonly sharpTurnThrottle: number;
 }
 
 export interface PlayerConfig extends ShipMovementConfig {
@@ -33,13 +40,15 @@ export interface PlayerConfig extends ShipMovementConfig {
   readonly broadside: BroadsideConfig;
 }
 
-export interface ChaserConfig extends ShipMovementConfig {
+export interface ChaserConfig extends EnemySteeringConfig {
   readonly contactDamage: number;
 }
 
-export interface ShooterConfig extends ShipMovementConfig {
+export interface ShooterConfig extends EnemySteeringConfig {
   readonly attackRange: number;
   readonly preferredRange: number;
+  readonly minApproachThrottle: number;
+  readonly lineOfSightRadius: number;
   readonly aimToleranceRadians: number;
   readonly cannon: WeaponConfig;
 }
@@ -54,6 +63,8 @@ export interface SpawnConfig {
   readonly initialDelaySeconds: number;
   readonly maxAlive: number;
   readonly minDistanceFromPlayer: number;
+  readonly clearance: number;
+  readonly candidateAttempts: number;
   readonly distribution: EnemyDistribution;
 }
 
@@ -67,6 +78,7 @@ export interface ArenaConfig {
 
 export interface NavigationConfig {
   readonly refreshIntervalSeconds: number;
+  readonly clearanceMargin: number;
 }
 
 export interface GameConfig {
@@ -126,10 +138,13 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     initialDelaySeconds: 1.5,
     maxAlive: 12,
     minDistanceFromPlayer: 520,
+    clearance: 8,
+    candidateAttempts: 48,
     distribution: { chaser: 0.55, shooter: 0.45 },
   },
   navigation: {
     refreshIntervalSeconds: 0.25,
+    clearanceMargin: 2,
   },
   player: {
     maxHealth: 100,
@@ -138,6 +153,7 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     acceleration: 260,
     deceleration: 200,
     turnSpeed: 2.6,
+    collisionSpeedFactor: 0.35,
     frontCannon: {
       cooldownSeconds: 0.45,
       damage: 25,
@@ -155,6 +171,7 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
       projectileRadius: 6,
       projectileCount: 3,
       spacing: 22,
+      sideOffsetRatio: 0.6,
     },
   },
   chaser: {
@@ -164,6 +181,9 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     acceleration: 220,
     deceleration: 200,
     turnSpeed: 2.2,
+    collisionSpeedFactor: 0.35,
+    sharpTurnRadians: Math.PI / 2,
+    sharpTurnThrottle: 0.4,
     contactDamage: 20,
   },
   shooter: {
@@ -173,8 +193,13 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     acceleration: 160,
     deceleration: 180,
     turnSpeed: 1.8,
+    collisionSpeedFactor: 0.35,
+    sharpTurnRadians: Math.PI / 2,
+    sharpTurnThrottle: 0.4,
     attackRange: 420,
     preferredRange: 300,
+    minApproachThrottle: 0.35,
+    lineOfSightRadius: 4,
     aimToleranceRadians: 0.2,
     cannon: {
       cooldownSeconds: 1.6,
@@ -188,6 +213,7 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
 };
 
 export function clampOption(key: keyof PlayerOptions, value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_PLAYER_OPTIONS[key];
   const { min, max } = OPTION_LIMITS[key];
   return Math.min(max, Math.max(min, value));
 }

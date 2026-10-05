@@ -45,7 +45,7 @@ export class Simulation {
     this.spawner = new EnemySpawner(config.spawn, this.random);
     this.flowField = new FlowField(
       this.arena,
-      Math.max(config.chaser.radius, config.shooter.radius) + 2,
+      Math.max(config.chaser.radius, config.shooter.radius) + config.navigation.clearanceMargin,
     );
     const start = config.arena.playerStart;
     this.state = {
@@ -71,13 +71,18 @@ export class Simulation {
     this.updateNavigation(dt);
     this.updateEnemies(dt);
     this.resolveShipContacts();
-    this.updateProjectiles(dt);
+    if (this.isRunning()) this.updateProjectiles(dt);
     this.removeDestroyedEnemies();
+    if (!this.isRunning()) return;
 
     if (this.state.elapsedSeconds >= this.config.matchDurationSeconds - TIME_EPSILON) {
       this.state.elapsedSeconds = this.config.matchDurationSeconds;
       this.end('time');
     }
+  }
+
+  isRunning(): boolean {
+    return this.state.status === 'running';
   }
 
   spawnEnemy(kind: EnemyKind, position: Vec2, heading: number): Ship {
@@ -163,10 +168,12 @@ export class Simulation {
       player,
       enemies,
       this.config[kind].radius,
-      this.config.spawn.minDistanceFromPlayer,
+      this.config.spawn,
       this.random,
     );
-    if (point) this.spawnEnemy(kind, point, angleTo(point, player.position));
+    if (!point) return;
+    this.spawner.confirm(kind);
+    this.spawnEnemy(kind, point, angleTo(point, player.position));
   }
 
   private updateNavigation(dt: number): void {

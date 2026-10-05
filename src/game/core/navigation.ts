@@ -19,7 +19,7 @@ export class FlowField {
   readonly cellSize: number;
   private readonly walkable: Uint8Array;
   private readonly cost: Float64Array;
-  private readonly heap: number[] = [];
+  private readonly queue = new MinQueue();
 
   constructor(arena: Arena, clearance: number) {
     this.cellSize = arena.tileSize / 2;
@@ -48,14 +48,15 @@ export class FlowField {
     const start = this.nearestWalkable(target);
     if (start === null) return;
 
-    const heap = this.heap;
-    heap.length = 0;
+    const queue = this.queue;
+    queue.clear();
     this.cost[start] = 0;
-    heapPush(heap, start, this.cost);
+    queue.push(start, 0);
 
-    while (heap.length > 0) {
-      const current = heapPop(heap, this.cost);
-      const currentCost = this.cost[current] ?? UNREACHABLE;
+    while (queue.size > 0) {
+      const currentCost = queue.peekPriority();
+      const current = queue.pop();
+      if (currentCost > (this.cost[current] ?? UNREACHABLE)) continue;
       const col = current % this.cols;
       const row = (current - col) / this.cols;
 
@@ -71,7 +72,7 @@ export class FlowField {
         const candidate = currentCost + stepCost;
         if (candidate < (this.cost[next] ?? UNREACHABLE)) {
           this.cost[next] = candidate;
-          heapPush(heap, next, this.cost);
+          queue.push(next, candidate);
         }
       }
     }
@@ -146,47 +147,71 @@ export class FlowField {
   }
 }
 
-function heapPush(heap: number[], value: number, cost: Float64Array): void {
-  heap.push(value);
-  let index = heap.length - 1;
-  while (index > 0) {
-    const parent = (index - 1) >> 1;
-    if (priority(heap, parent, cost) <= priority(heap, index, cost)) break;
-    swap(heap, parent, index);
-    index = parent;
+class MinQueue {
+  private readonly nodes: number[] = [];
+  private readonly priorities: number[] = [];
+
+  get size(): number {
+    return this.nodes.length;
   }
-}
 
-function heapPop(heap: number[], cost: Float64Array): number {
-  const top = heap[0] ?? 0;
-  const last = heap.pop() ?? 0;
-  if (heap.length === 0) return top;
-
-  heap[0] = last;
-  let index = 0;
-  for (;;) {
-    const left = index * 2 + 1;
-    const right = left + 1;
-    let smallest = index;
-    if (left < heap.length && priority(heap, left, cost) < priority(heap, smallest, cost)) {
-      smallest = left;
-    }
-    if (right < heap.length && priority(heap, right, cost) < priority(heap, smallest, cost)) {
-      smallest = right;
-    }
-    if (smallest === index) break;
-    swap(heap, smallest, index);
-    index = smallest;
+  clear(): void {
+    this.nodes.length = 0;
+    this.priorities.length = 0;
   }
-  return top;
-}
 
-function priority(heap: number[], index: number, cost: Float64Array): number {
-  return cost[heap[index] ?? 0] ?? UNREACHABLE;
-}
+  peekPriority(): number {
+    return this.priorities[0] ?? UNREACHABLE;
+  }
 
-function swap(heap: number[], a: number, b: number): void {
-  const temp = heap[a] ?? 0;
-  heap[a] = heap[b] ?? 0;
-  heap[b] = temp;
+  push(node: number, priority: number): void {
+    this.nodes.push(node);
+    this.priorities.push(priority);
+    let index = this.nodes.length - 1;
+    while (index > 0) {
+      const parent = (index - 1) >> 1;
+      if (this.priorityAt(parent) <= priority) break;
+      this.swap(parent, index);
+      index = parent;
+    }
+  }
+
+  pop(): number {
+    const top = this.nodes[0] ?? 0;
+    const lastNode = this.nodes.pop() ?? 0;
+    const lastPriority = this.priorities.pop() ?? UNREACHABLE;
+    if (this.nodes.length === 0) return top;
+
+    this.nodes[0] = lastNode;
+    this.priorities[0] = lastPriority;
+    let index = 0;
+    for (;;) {
+      const left = index * 2 + 1;
+      const right = left + 1;
+      let smallest = index;
+      if (left < this.nodes.length && this.priorityAt(left) < this.priorityAt(smallest)) {
+        smallest = left;
+      }
+      if (right < this.nodes.length && this.priorityAt(right) < this.priorityAt(smallest)) {
+        smallest = right;
+      }
+      if (smallest === index) break;
+      this.swap(smallest, index);
+      index = smallest;
+    }
+    return top;
+  }
+
+  private priorityAt(index: number): number {
+    return this.priorities[index] ?? UNREACHABLE;
+  }
+
+  private swap(a: number, b: number): void {
+    const node = this.nodes[a] ?? 0;
+    const priority = this.priorityAt(a);
+    this.nodes[a] = this.nodes[b] ?? 0;
+    this.priorities[a] = this.priorityAt(b);
+    this.nodes[b] = node;
+    this.priorities[b] = priority;
+  }
 }

@@ -22,7 +22,7 @@ export function moveShip(
 
   const collided = arena.resolveCircle(ship.position, ship.radius);
   if (collided) {
-    ship.speed = Math.min(ship.speed, config.maxSpeed * 0.35);
+    ship.speed = Math.min(ship.speed, config.maxSpeed * config.collisionSpeedFactor);
   }
   return collided;
 }
