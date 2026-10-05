@@ -10,27 +10,36 @@ test.describe('enemies', () => {
     page,
   }) => {
     await startBattle(page, { seed: 9, spawnIntervalSeconds: 2 });
-    const spawnTimes = new Map<number, number>();
-
-    for (let i = 0; i < 40; i += 1) {
-      await advance(page, 0.2);
-      const state = await readState(page);
-      for (const enemy of state.enemies) {
-        if (spawnTimes.has(enemy.id)) continue;
-        spawnTimes.set(enemy.id, state.elapsedSeconds);
-        expect(distance(enemy, state.player)).toBeGreaterThan(500);
-        for (const island of state.arena.islands) {
-          const inside =
-            enemy.x > island.x - 20 &&
-            enemy.x < island.x + island.width + 20 &&
-            enemy.y > island.y - 20 &&
-            enemy.y < island.y + island.height + 20;
-          expect(inside).toBe(false);
+    const spawns = await page.evaluate(() => {
+      const probe = window.__pirateBattle;
+      if (!probe) throw new Error('Battle probe is not available');
+      const seen = new Map<number, { elapsed: number; distance: number; onIsland: boolean }>();
+      for (let i = 0; i < 40; i += 1) {
+        probe.advance(0.2);
+        const state = probe.getState();
+        for (const enemy of state.enemies) {
+          if (seen.has(enemy.id)) continue;
+          seen.set(enemy.id, {
+            elapsed: state.elapsedSeconds,
+            distance: Math.hypot(enemy.x - state.player.x, enemy.y - state.player.y),
+            onIsland: state.arena.islands.some(
+              (island) =>
+                enemy.x > island.x - 20 &&
+                enemy.x < island.x + island.width + 20 &&
+                enemy.y > island.y - 20 &&
+                enemy.y < island.y + island.height + 20,
+            ),
+          });
         }
       }
-    }
+      return [...seen.values()];
+    });
 
-    const times = [...spawnTimes.values()].sort((a, b) => a - b);
+    for (const spawn of spawns) {
+      expect(spawn.distance).toBeGreaterThan(500);
+      expect(spawn.onIsland).toBe(false);
+    }
+    const times = spawns.map((spawn) => spawn.elapsed).sort((a, b) => a - b);
     expect(times.length).toBeGreaterThanOrEqual(4);
     expect(times[0]).toBeCloseTo(1.5, 0);
     for (let i = 1; i < times.length; i += 1) {
