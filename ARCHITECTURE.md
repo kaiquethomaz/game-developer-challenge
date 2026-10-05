@@ -67,11 +67,11 @@ Pausing (manual, `blur` or `visibilitychange`) stops feeding the accumulator, re
 
   Loading reports progress, retries twice per asset and surfaces a retryable error before combat starts. Pixi drops failed promises from its cache, so a retry really refetches. Atlases stay cached between battles.
 
-- **Arena.** It is built once from tiles, with shallow water rings, grass or sand islands and deterministic decorations, then cached as a texture.
-- **Ship views.** Each one switches between four hull damage stages, shows flickering fires as health drops, flashes on hit and owns a health bar above the hull. Bar fills are cropped textures cached per 2.5% step and shared by every ship.
+- **Arena.** It is built once from tiles in two cached layers: open water, and land with shallow water rings, grass or sand islands, deterministic decorations and a landmark per large island (a fort, a cannon battery or ruins) assembled from the provided stone tiles. Between them, a translucent tiling sprite of the water tile drifts slowly so the sea shimmers without redrawing the cached layers.
+- **Ship views.** Each one switches between four hull damage stages, shows flickering fires as health drops, flashes on hit, sways gently on the swell and owns a health bar above the hull. Moving ships leave a pooled foam wake whose strength follows their speed, and cannonballs cast a small offset shadow. Bar fills are cropped textures cached per 2.5% step and shared by every ship.
 - **Projectiles and effects.** Both use pooled sprites: muzzle smoke, hits, splashes, explosions, debris and sinking wrecks.
 - **Feedback layers.** Salvage, floating score and repair numbers (pooled `Text` objects) and a red edge vignette on player damage are separate layers. The vignette texture is drawn once on a 2D canvas and stretched to the screen; under reduced motion it is fainter and numbers do not rise.
-- **Screen shake.** It is disabled when the user prefers reduced motion.
+- **Reduced motion.** Screen shake, the drifting sea, hull sway and rising numbers are disabled when the user prefers reduced motion; wakes and effects still show state changes.
 - **Canvas scaling.** The canvas follows its host with `resizeTo`, uses `autoDensity` and a resolution capped at 2, and letterboxes the fixed 1920×1088 world while preserving its proportions. Input is action-based (keys and DOM buttons), so it is unaffected by scaling.
 - **Teardown.** `GameSession.destroy` removes the visibility and blur listeners and the ticker callback, detaches the keyboard, releases inputs, destroys ship views, cached fill textures and generated textures, and destroys the Pixi application with its children while keeping the shared atlases. The profiling report checks that canvases, DOM nodes and heap return to their menu baseline after five battles.
 
