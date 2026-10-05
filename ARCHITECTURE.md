@@ -147,6 +147,12 @@ MSW handlers (`src/mocks/handlers.ts`) run in the browser in development, in the
 - **Visual baselines.** They use a fixed locale, the UTC timezone and reduced motion. Font rasterization differs between operating systems, so baselines are stored per platform (`__screenshots__/{win32,linux}`). Linux baselines are produced inside the official Playwright Docker image, the same image CI runs, so they match on any host; `npm run test:e2e:docker` runs the suite there from Windows, macOS or Linux.
 - **CI.** GitHub Actions runs lint, type checks, formatting, unit tests and the build, then the Playwright suite in the Playwright container, uploading the HTML report and failure traces as artifacts.
 
+## Difficulty
+
+Calm Waters, Open Sea and Kraken's Wrath are presets in `DIFFICULTY_PRESETS`. `createMatchConfig` applies one on top of the base balance: it replaces the alive cap ramp and the enemy mix ramp, and scales enemy damage and salvage chances. The player's duration and spawn interval are never touched, so spawns still happen on every configured interval. Open Sea is the base balance itself, which a unit test checks.
+
+The difficulty travels with the match configuration snapshot (`MatchConfigSnapshot`), so it is part of every submission, every history row and the ranking key. Parsers on every boundary (stored options, last result, pending queue, mock database, request query) default a missing difficulty to Open Sea, so data written before the feature keeps working.
+
 ## Balancing decisions
 
 | Decision                                                                 | Reason                                                                                                                                 |

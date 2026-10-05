@@ -85,6 +85,16 @@ The Options screen exposes two values, validated and persisted in `localStorage`
 | Game session time | 60–180 s | 1 s   | 120 s   |
 | Enemy spawn time  | 1–10 s   | 0.5 s | 3 s     |
 
+It also offers a **difficulty**. Presets live next to the balance in `DIFFICULTY_PRESETS` and never change the two options above:
+
+| Difficulty     | Enemies alive (start → end) | Late mix, chasers / shooters | Enemy damage | Salvage chance |
+| -------------- | --------------------------- | ---------------------------- | ------------ | -------------- |
+| Calm Waters    | 3 → 6                       | 55 / 45                      | ×0.75        | ×1.4           |
+| Open Sea       | 4 → 10                      | 40 / 60                      | ×1           | ×1             |
+| Kraken's Wrath | 6 → 14                      | 30 / 70                      | ×1.3         | ×0.8           |
+
+The difficulty is part of the match configuration: it is stored with every record, and the ranking only compares battles played with the same duration, spawn interval and difficulty. Records saved before difficulties existed are read as Open Sea.
+
 Each match takes a snapshot of the options when it starts (`createMatchConfig`), so changing them mid-battle only affects the next one. The Options screen also stores the captain name shown in the ranking and a sound toggle.
 
 ## Network scenarios
