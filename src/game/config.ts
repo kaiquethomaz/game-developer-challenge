@@ -203,8 +203,8 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     lineOfSightRadius: 4,
     aimToleranceRadians: 0.2,
     cannon: {
-      cooldownSeconds: 1.6,
-      damage: 10,
+      cooldownSeconds: 1.8,
+      damage: 8,
       projectileSpeed: 420,
       projectileRange: 460,
       projectileLifetimeSeconds: 1.4,
