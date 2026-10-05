@@ -26,13 +26,17 @@ test.describe('pause', () => {
     expect(stillPaused.player.cooldowns).toEqual(paused.player.cooldowns);
     expect(stillPaused.projectiles).toEqual(paused.projectiles);
 
+    const resumeStartedAt = Date.now();
     await dialog.getByRole('button', { name: 'Resume' }).click();
     await expect(dialog).toBeHidden();
     await page.waitForTimeout(400);
     const resumed = await readState(page);
+    const realSecondsSinceResume = (Date.now() - resumeStartedAt) / 1000;
     expect(resumed.status).toBe('running');
-    expect(resumed.elapsedSeconds - paused.elapsedSeconds).toBeLessThan(1);
     expect(resumed.elapsedSeconds).toBeGreaterThan(paused.elapsedSeconds);
+    expect(resumed.elapsedSeconds - paused.elapsedSeconds).toBeLessThanOrEqual(
+      realSecondsSinceResume + 0.05,
+    );
   });
 
   test('held input is not carried over the pause', async ({ page }) => {
