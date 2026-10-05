@@ -1,11 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { LOW_HEALTH_RATIO, TIME_WARNING_SECONDS } from '../session/alerts';
 import type { GameSession } from '../session/GameSession';
 import type { HudSnapshot } from '../session/HudStore';
 import { audio } from './AudioManager';
 import { playBattleEvents } from './battleSounds';
-
-const TIME_WARNING_SECONDS = 10;
-const LOW_HEALTH_RATIO = 0.3;
 
 function pickRandom<T>(items: readonly T[]): T {
   const item = items[Math.floor(Math.random() * items.length)] ?? items[0];

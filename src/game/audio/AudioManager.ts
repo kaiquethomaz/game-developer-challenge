@@ -34,6 +34,7 @@ export class AudioManager {
   private readonly lastPlayed = new Map<SoundId, number>();
   private loading: Promise<void> | null = null;
   private ambience: AudioBufferSourceNode | null = null;
+  private ambienceRequest = 0;
   private enabled = true;
 
   setEnabled(enabled: boolean): void {
@@ -76,7 +77,10 @@ export class AudioManager {
   }
 
   async startAmbience(): Promise<void> {
+    this.ambienceRequest += 1;
+    const request = this.ambienceRequest;
     await this.loading;
+    if (request !== this.ambienceRequest) return;
     const context = this.context;
     const buffer = this.buffers.get('ocean_ambience_loop');
     if (!context || !this.master || !buffer || this.ambience) return;
@@ -92,18 +96,11 @@ export class AudioManager {
   }
 
   stopAmbience(): void {
+    this.ambienceRequest += 1;
     if (!this.ambience) return;
     this.ambience.stop();
     this.ambience.disconnect();
     this.ambience = null;
-  }
-
-  suspend(): void {
-    if (this.context?.state === 'running') void this.context.suspend().catch(() => undefined);
-  }
-
-  resume(): void {
-    if (this.context?.state === 'suspended') void this.context.resume().catch(() => undefined);
   }
 
   private async preload(): Promise<void> {
