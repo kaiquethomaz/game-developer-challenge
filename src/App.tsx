@@ -36,6 +36,7 @@ type Screen =
   | { readonly name: 'menu' }
   | { readonly name: 'log'; readonly tab: LogTab }
   | { readonly name: 'options' }
+  | { readonly name: 'setup' }
   | { readonly name: 'game'; readonly run: number }
   | { readonly name: 'result' };
 
@@ -135,7 +136,9 @@ export function App() {
           {screen.name === 'menu' && (
             <MainMenu
               lastResult={lastResult}
-              onPlay={startGame}
+              onPlay={() => {
+                setScreen({ name: 'setup' });
+              }}
               onOptions={() => {
                 setScreen({ name: 'options' });
               }}
@@ -153,6 +156,22 @@ export function App() {
               options={options}
               profile={profile}
               onSave={handleSaveOptions}
+              soundEnabled={soundEnabled}
+              onSoundChange={handleSoundChange}
+              onClose={goToMenu}
+              closeLabel="Main menu"
+            />
+          )}
+          {screen.name === 'setup' && (
+            <OptionsPanel
+              title="Prepare for battle"
+              titleId="setup-title"
+              note="Check your battle settings, then set sail."
+              submitLabel="Set sail"
+              options={options}
+              profile={profile}
+              onSave={handleSaveOptions}
+              onSubmitted={startGame}
               soundEnabled={soundEnabled}
               onSoundChange={handleSoundChange}
               onClose={goToMenu}
@@ -267,6 +286,8 @@ function screenTitle(screen: Screen): string {
       return 'Battle · Pirate Battle';
     case 'options':
       return 'Options · Pirate Battle';
+    case 'setup':
+      return 'Prepare for battle · Pirate Battle';
     case 'log':
       return `${screen.tab === 'ranking' ? 'Ranking' : 'Match history'} · Pirate Battle`;
     case 'result':

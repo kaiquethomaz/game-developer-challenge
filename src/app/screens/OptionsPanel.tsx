@@ -18,7 +18,10 @@ import { Button, RoundButton } from '../../ui/Button';
 interface OptionsPanelProps {
   readonly options: PlayerOptions;
   readonly profile: PlayerProfile;
+  readonly title?: string;
   readonly titleId: string;
+  readonly submitLabel?: string;
+  readonly onSubmitted?: () => void;
   readonly note?: string;
   readonly onSave: (options: PlayerOptions, captainName: string) => boolean;
   readonly soundEnabled: boolean;
@@ -30,7 +33,10 @@ interface OptionsPanelProps {
 export function OptionsPanel({
   options,
   profile,
+  title = 'Options',
   titleId,
+  submitLabel = 'Save',
+  onSubmitted,
   note,
   onSave,
   soundEnabled,
@@ -60,8 +66,13 @@ export function OptionsPanel({
       return;
     }
     setErrors({});
+    const stored = onSave(result.options, result.captainName);
+    if (onSubmitted) {
+      onSubmitted();
+      return;
+    }
     setStatus(
-      onSave(result.options, result.captainName)
+      stored
         ? 'Options saved. They apply to your next battle.'
         : 'Options could not be stored on this device.',
     );
@@ -70,7 +81,7 @@ export function OptionsPanel({
   return (
     <section className="panel" aria-labelledby={titleId}>
       <h1 className="panel__title" id={titleId}>
-        Options
+        {title}
       </h1>
       {note && <p className="status-text">{note}</p>}
       <form
@@ -135,7 +146,9 @@ export function OptionsPanel({
           {status}
         </p>
         <div className="button-stack">
-          <Button type="submit">Save</Button>
+          <Button type="submit" autoFocus={onSubmitted !== undefined}>
+            {submitLabel}
+          </Button>
           <Button variant="secondary" onClick={onClose}>
             {closeLabel}
           </Button>
