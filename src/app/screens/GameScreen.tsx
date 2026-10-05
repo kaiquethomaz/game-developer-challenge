@@ -229,7 +229,7 @@ function BattleOverlay({
             <p className="status-text">{pauseMessage(hud.pauseReason)}</p>
             <div className="button-stack">
               <Button
-                autoFocus
+                data-autofocus
                 onClick={() => {
                   session.resume();
                 }}

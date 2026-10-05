@@ -17,6 +17,10 @@ export function Dialog({ open, labelledBy, onCancel, children }: DialogProps) {
     const previouslyFocused =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
     if (!dialog.open) dialog.showModal();
+    const initialFocus =
+      dialog.querySelector<HTMLElement>('[data-autofocus]') ??
+      dialog.querySelector<HTMLElement>('button, [href], input, select, textarea');
+    initialFocus?.focus();
 
     return () => {
       if (dialog.open) dialog.close();
