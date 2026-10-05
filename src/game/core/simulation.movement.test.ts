@@ -61,7 +61,7 @@ describe('player movement', () => {
 
   it('stays inside the arena bounds', () => {
     const simulation = new Simulation(openWaterConfig, 1);
-    run(simulation, 10, { ...createIdleIntent(), thrust: true });
+    run(simulation, 15, { ...createIdleIntent(), thrust: true });
     const { player } = simulation.state;
     expect(player.position.x).toBeCloseTo(simulation.arena.width - player.radius);
   });
