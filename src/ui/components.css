@@ -190,3 +190,7 @@
 .round-button:focus-visible {
   border-radius: 999px;
 }
+
+.dialog .panel {
+  max-height: calc(100dvh - 24px);
+}
