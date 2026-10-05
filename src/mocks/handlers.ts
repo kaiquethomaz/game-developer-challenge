@@ -3,10 +3,9 @@ import {
   API_ROUTES,
   DEFAULT_PAGE_SIZE,
   MAX_PAGE_SIZE,
+  parseMatchSubmission,
   type ApiErrorBody,
-  type MatchSubmission,
 } from '../api/contracts';
-import { isRecord } from '../storage/localStore';
 import { queryHistory, queryRanking, saveMatch } from './matchStore';
 import { mockBackend } from './mockBackend';
 
@@ -60,7 +59,7 @@ export const handlers: RequestHandler[] = [
     if (failure) return failure;
 
     const body: unknown = await request.json().catch(() => null);
-    const submission = parseSubmission(body);
+    const submission = parseMatchSubmission(body);
     if (!submission || submission.matchId !== params.matchId) {
       return errorResponse(422, 'invalid_match', 'The match payload is invalid.');
     }
@@ -134,39 +133,4 @@ function readPage(url: URL): number {
 function readPageSize(url: URL): number {
   const size = Number(url.searchParams.get('pageSize') ?? DEFAULT_PAGE_SIZE);
   return Number.isInteger(size) && size > 0 ? Math.min(size, MAX_PAGE_SIZE) : DEFAULT_PAGE_SIZE;
-}
-
-function parseSubmission(value: unknown): MatchSubmission | null {
-  if (!isRecord(value) || !isRecord(value.config)) return null;
-  const { matchId, playerId, captainName, playedAt, score, durationSeconds, endReason, config } =
-    value;
-  if (
-    typeof matchId !== 'string' ||
-    typeof playerId !== 'string' ||
-    typeof captainName !== 'string' ||
-    typeof playedAt !== 'string' ||
-    typeof score !== 'number' ||
-    !Number.isInteger(score) ||
-    score < 0 ||
-    typeof durationSeconds !== 'number' ||
-    durationSeconds < 0 ||
-    (endReason !== 'time' && endReason !== 'death') ||
-    typeof config.matchDurationSeconds !== 'number' ||
-    typeof config.spawnIntervalSeconds !== 'number'
-  ) {
-    return null;
-  }
-  return {
-    matchId,
-    playerId,
-    captainName,
-    playedAt,
-    score,
-    durationSeconds,
-    endReason,
-    config: {
-      matchDurationSeconds: config.matchDurationSeconds,
-      spawnIntervalSeconds: config.spawnIntervalSeconds,
-    },
-  };
 }

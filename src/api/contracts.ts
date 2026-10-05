@@ -1,3 +1,5 @@
+import { isRecord } from '../storage/localStore';
+
 export type MatchEndReason = 'time' | 'death';
 
 export interface MatchConfigSnapshot {
@@ -63,3 +65,38 @@ export const API_ROUTES = {
 
 export const DEFAULT_PAGE_SIZE = 5;
 export const MAX_PAGE_SIZE = 50;
+
+export function parseMatchSubmission(value: unknown): MatchSubmission | null {
+  if (!isRecord(value) || !isRecord(value.config)) return null;
+  const { matchId, playerId, captainName, playedAt, score, durationSeconds, endReason, config } =
+    value;
+  if (
+    typeof matchId !== 'string' ||
+    typeof playerId !== 'string' ||
+    typeof captainName !== 'string' ||
+    typeof playedAt !== 'string' ||
+    typeof score !== 'number' ||
+    !Number.isInteger(score) ||
+    score < 0 ||
+    typeof durationSeconds !== 'number' ||
+    durationSeconds < 0 ||
+    (endReason !== 'time' && endReason !== 'death') ||
+    typeof config.matchDurationSeconds !== 'number' ||
+    typeof config.spawnIntervalSeconds !== 'number'
+  ) {
+    return null;
+  }
+  return {
+    matchId,
+    playerId,
+    captainName,
+    playedAt,
+    score,
+    durationSeconds,
+    endReason,
+    config: {
+      matchDurationSeconds: config.matchDurationSeconds,
+      spawnIntervalSeconds: config.spawnIntervalSeconds,
+    },
+  };
+}
