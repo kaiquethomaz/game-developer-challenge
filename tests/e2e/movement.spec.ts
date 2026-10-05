@@ -57,7 +57,7 @@ test.describe('movement', () => {
   });
 
   test('stays inside the visible arena', async ({ page }) => {
-    await holdKeys(page, ['KeyW'], 9);
+    await holdKeys(page, ['KeyW'], 12);
     const state = await readState(page);
     expect(state.player.x).toBeLessThanOrEqual(state.arena.width - 25);
     expect(state.player.x).toBeGreaterThan(state.arena.width - 40);

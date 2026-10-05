@@ -6,6 +6,7 @@ export interface BattleSetup {
   readonly seed?: number;
   readonly matchDurationSeconds?: number;
   readonly spawnIntervalSeconds?: number;
+  readonly difficulty?: 'calm' | 'open' | 'kraken';
   readonly scenario?: string;
   readonly manualClock?: boolean;
 }
@@ -14,7 +15,7 @@ export const STEP_SECONDS = 1 / 60;
 
 export async function storeOptions(
   page: Page,
-  options: { matchDurationSeconds: number; spawnIntervalSeconds: number },
+  options: { matchDurationSeconds: number; spawnIntervalSeconds: number; difficulty: string },
 ): Promise<void> {
   await page.addInitScript((value) => {
     if (sessionStorage.getItem('e2e:options-seeded')) return;
@@ -31,10 +32,15 @@ export function battleUrl(setup: BattleSetup = {}): string {
 }
 
 export async function startBattle(page: Page, setup: BattleSetup = {}): Promise<void> {
-  if (setup.matchDurationSeconds !== undefined || setup.spawnIntervalSeconds !== undefined) {
+  if (
+    setup.matchDurationSeconds !== undefined ||
+    setup.spawnIntervalSeconds !== undefined ||
+    setup.difficulty !== undefined
+  ) {
     await storeOptions(page, {
       matchDurationSeconds: setup.matchDurationSeconds ?? 120,
       spawnIntervalSeconds: setup.spawnIntervalSeconds ?? 3,
+      difficulty: setup.difficulty ?? 'open',
     });
   }
   await page.goto(battleUrl(setup));
@@ -55,6 +61,15 @@ export async function advance(page: Page, seconds: number): Promise<void> {
     const probe = window.__pirateBattle;
     if (!probe) throw new Error('Battle probe is not available');
     probe.advance(total);
+  }, seconds);
+}
+
+async function advanceAndRead(page: Page, seconds: number): Promise<GameStateProbe> {
+  return page.evaluate((total) => {
+    const probe = window.__pirateBattle;
+    if (!probe) throw new Error('Battle probe is not available');
+    probe.advance(total);
+    return probe.getState();
   }, seconds);
 }
 
@@ -97,8 +112,7 @@ export async function advanceUntil(
 ): Promise<GameStateProbe> {
   let state = await readState(page);
   for (let elapsed = 0; elapsed < maxSeconds && !predicate(state); elapsed += chunkSeconds) {
-    await advance(page, chunkSeconds);
-    state = await readState(page);
+    state = await advanceAndRead(page, chunkSeconds);
   }
   expect(predicate(state), 'condition reached within the time limit').toBe(true);
   return state;
