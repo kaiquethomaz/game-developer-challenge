@@ -34,6 +34,28 @@ test.describe("captain's log", () => {
     await expect(pager(page).getByText('Page 1 of 3')).toBeVisible();
   });
 
+  test('keeps a separate ranking for each difficulty', async ({ page }) => {
+    await openLog(page, 'latency=0&scenario=success', 'Ranking');
+    await expect(page.getByText('Open Sea · 120 second battles')).toBeVisible();
+    const openSeaLeader = await rankingRows(page).first().innerText();
+
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'pirate-battle:options',
+        JSON.stringify({
+          matchDurationSeconds: 120,
+          spawnIntervalSeconds: 3,
+          difficulty: 'kraken',
+        }),
+      );
+    });
+    await page.reload();
+    await page.getByRole('button', { name: 'Ranking', exact: true }).click();
+    await expect(page.getByText("Kraken's Wrath · 120 second battles")).toBeVisible();
+    await expect(rankingRows(page)).toHaveCount(5);
+    expect(await rankingRows(page).first().innerText()).not.toBe(openSeaLeader);
+  });
+
   test('switches tabs with the keyboard', async ({ page }) => {
     await openLog(page, 'latency=0', 'Ranking');
     const rankingTab = page.getByRole('tab', { name: 'Ranking' });

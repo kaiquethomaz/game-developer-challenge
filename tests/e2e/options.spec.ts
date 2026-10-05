@@ -26,6 +26,7 @@ test.describe('options', () => {
 
     await duration.fill('90');
     await spawn.fill('2.5');
+    await page.getByRole('radio', { name: /Kraken's Wrath/ }).check();
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Options saved' })).toBeVisible();
 
@@ -33,6 +34,7 @@ test.describe('options', () => {
     await page.getByRole('button', { name: 'Options', exact: true }).click();
     await expect(page.getByLabel('Game session time', { exact: true })).toHaveValue('90');
     await expect(page.getByLabel('Enemy spawn time', { exact: true })).toHaveValue('2.5');
+    await expect(page.getByRole('radio', { name: /Kraken's Wrath/ })).toBeChecked();
 
     await page.getByRole('button', { name: 'Main menu' }).click();
     await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
