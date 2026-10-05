@@ -1,9 +1,11 @@
 import type { GameConfig } from '../config';
 import { Arena } from './arena';
+import { separateShips, updateChaser, updateShooter, type SteeringContext } from './enemies';
 import type { EnemyKind, Faction, PlayerIntent, Ship, ShipKind, WeaponSlot } from './entities';
 import type { DestroyCause, EndReason, SimulationEvent } from './events';
 import { distanceSquared, type Vec2 } from './math';
 import { moveShip } from './movement';
+import { FlowField } from './navigation';
 import { ProjectilePool } from './projectiles';
 import { fireBroadside, fireFront, tickCooldowns, type ShotOrigin } from './weapons';
 
@@ -25,12 +27,18 @@ export class Simulation {
   private events: SimulationEvent[] = [];
   private nextId = 1;
   private wasPlayerBlocked = false;
+  private readonly flowField: FlowField;
+  private navigationTimer = 0;
 
   constructor(
     readonly config: GameConfig,
     readonly seed: number,
   ) {
     this.arena = new Arena(config.arena);
+    this.flowField = new FlowField(
+      this.arena,
+      Math.max(config.chaser.radius, config.shooter.radius) + 2,
+    );
     const start = config.arena.playerStart;
     this.state = {
       elapsedSeconds: 0,
@@ -51,7 +59,9 @@ export class Simulation {
 
     this.state.elapsedSeconds += dt;
     this.updatePlayer(dt, intent);
-    for (const enemy of this.state.enemies) tickCooldowns(enemy, dt);
+    this.updateNavigation(dt);
+    this.updateEnemies(dt);
+    this.resolveShipContacts();
     this.updateProjectiles(dt);
     this.removeDestroyedEnemies();
   }
@@ -126,6 +136,74 @@ export class Simulation {
         'right',
         fireBroadside(player, config.broadside, 'right', 'player', this.projectiles),
       );
+    }
+  }
+
+  private updateNavigation(dt: number): void {
+    this.navigationTimer -= dt;
+    if (this.navigationTimer > 0) return;
+    this.navigationTimer = this.config.navigation.refreshIntervalSeconds;
+    this.flowField.build(this.state.player.position);
+  }
+
+  private updateEnemies(dt: number): void {
+    const context: SteeringContext = {
+      arena: this.arena,
+      flowField: this.flowField,
+      player: this.state.player,
+    };
+
+    for (const enemy of this.state.enemies) {
+      if (!enemy.alive) continue;
+      tickCooldowns(enemy, dt);
+
+      if (enemy.kind === 'chaser') {
+        updateChaser(enemy, this.config.chaser, context, dt);
+        continue;
+      }
+
+      const wantsToFire = updateShooter(enemy, this.config.shooter, context, dt);
+      if (wantsToFire) {
+        this.emitShot(
+          enemy,
+          'front',
+          fireFront(enemy, this.config.shooter.cannon, 'enemy', this.projectiles),
+        );
+      }
+    }
+  }
+
+  private resolveShipContacts(): void {
+    const { player, enemies } = this.state;
+
+    for (const enemy of enemies) {
+      if (!enemy.alive || !player.alive) continue;
+      const reach = enemy.radius + player.radius;
+      if (
+        enemy.kind === 'chaser' &&
+        distanceSquared(enemy.position, player.position) <= reach * reach
+      ) {
+        this.emit({
+          type: 'hit',
+          target: 'player',
+          targetId: player.id,
+          faction: 'enemy',
+          x: enemy.position.x,
+          y: enemy.position.y,
+        });
+        this.destroyEnemy(enemy, 'collision');
+        this.applyDamage(player, this.config.chaser.contactDamage, 'collision');
+      }
+    }
+
+    for (let i = 0; i < enemies.length; i += 1) {
+      const a = enemies[i];
+      if (!a?.alive) continue;
+      if (player.alive) separateShips(player, a, this.arena);
+      for (let j = i + 1; j < enemies.length; j += 1) {
+        const b = enemies[j];
+        if (b?.alive) separateShips(a, b, this.arena);
+      }
     }
   }
 
