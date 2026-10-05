@@ -18,7 +18,7 @@ import { ProjectilePool } from './projectiles';
 import { createRandom, type Random } from './random';
 import { SalvageField } from './salvage';
 import { EnemySpawner, findSpawnPoint } from './spawner';
-import { fireBroadside, fireFront, tickCooldowns, type ShotOrigin } from './weapons';
+import { fireBroadside, fireFront, fireVolley, tickCooldowns, type ShotOrigin } from './weapons';
 
 export type MatchStatus = 'running' | 'ended';
 
@@ -134,7 +134,7 @@ export class Simulation {
       maxHealth: stats.maxHealth,
       radius: stats.radius,
       alive: true,
-      cooldowns: { front: 0, left: 0, right: 0 },
+      cooldowns: { front: 0, left: 0, right: 0, volley: 0 },
     };
   }
 
@@ -172,6 +172,13 @@ export class Simulation {
         player,
         'right',
         fireBroadside(player, config.broadside, 'right', 'player', this.projectiles),
+      );
+    }
+    if (intent.fireVolley) {
+      this.emitShot(
+        player,
+        'volley',
+        fireVolley(player, config.volley, 'player', this.projectiles),
       );
     }
   }

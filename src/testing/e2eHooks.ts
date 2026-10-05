@@ -18,7 +18,7 @@ export interface GameStateProbe {
     readonly heading: number;
     readonly health: number;
     readonly alive: boolean;
-    readonly cooldowns: Readonly<Record<'front' | 'left' | 'right', number>>;
+    readonly cooldowns: Readonly<Record<'front' | 'left' | 'right' | 'volley', number>>;
   };
   readonly enemies: readonly {
     readonly id: number;

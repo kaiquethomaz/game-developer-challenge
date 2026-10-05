@@ -3,7 +3,8 @@ import type { Vec2 } from './math';
 export type ShipKind = 'player' | 'chaser' | 'shooter';
 export type EnemyKind = Exclude<ShipKind, 'player'>;
 export type Faction = 'player' | 'enemy';
-export type WeaponSlot = 'front' | 'left' | 'right';
+export type WeaponSlot = 'front' | 'left' | 'right' | 'volley';
+export type BroadsideSide = 'left' | 'right';
 
 export interface Ship {
   readonly id: number;
@@ -36,10 +37,18 @@ export interface PlayerIntent {
   fireFront: boolean;
   fireLeft: boolean;
   fireRight: boolean;
+  fireVolley: boolean;
 }
 
 export function createIdleIntent(): PlayerIntent {
-  return { thrust: false, turn: 0, fireFront: false, fireLeft: false, fireRight: false };
+  return {
+    thrust: false,
+    turn: 0,
+    fireFront: false,
+    fireLeft: false,
+    fireRight: false,
+    fireVolley: false,
+  };
 }
 
 export function healthRatio(ship: Ship): number {

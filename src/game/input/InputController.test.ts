@@ -15,6 +15,7 @@ describe('InputController', () => {
       fireFront: false,
       fireLeft: true,
       fireRight: false,
+      fireVolley: false,
     });
   });
 

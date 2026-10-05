@@ -61,6 +61,7 @@ describe('match rules', () => {
       fireFront: true,
       fireLeft: true,
       fireRight: true,
+      fireVolley: true,
     };
     runSeconds(simulation, 61, holdAll);
     expect(simulation.state.status).toBe('ended');

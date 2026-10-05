@@ -34,6 +34,7 @@ export class InputController {
     out.fireFront = this.isHeld('fireFront');
     out.fireLeft = this.isHeld('fireLeft');
     out.fireRight = this.isHeld('fireRight');
+    out.fireVolley = this.isHeld('fireVolley');
     return out;
   }
 }

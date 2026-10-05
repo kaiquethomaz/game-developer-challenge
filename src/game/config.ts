@@ -20,6 +20,11 @@ export interface BroadsideConfig extends WeaponConfig {
   readonly sideOffsetRatio: number;
 }
 
+export interface VolleyConfig extends WeaponConfig {
+  readonly projectileCount: number;
+  readonly spreadRadians: number;
+}
+
 export interface ShipMovementConfig {
   readonly maxHealth: number;
   readonly radius: number;
@@ -38,6 +43,7 @@ export interface EnemySteeringConfig extends ShipMovementConfig {
 export interface PlayerConfig extends ShipMovementConfig {
   readonly frontCannon: WeaponConfig;
   readonly broadside: BroadsideConfig;
+  readonly volley: VolleyConfig;
 }
 
 export interface ChaserConfig extends EnemySteeringConfig {
@@ -201,6 +207,16 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
       projectileCount: 3,
       spacing: 22,
       sideOffsetRatio: 0.6,
+    },
+    volley: {
+      cooldownSeconds: 6,
+      damage: 25,
+      projectileSpeed: 640,
+      projectileRange: 520,
+      projectileLifetimeSeconds: 1.1,
+      projectileRadius: 7,
+      projectileCount: 3,
+      spreadRadians: 0.24,
     },
   },
   chaser: {

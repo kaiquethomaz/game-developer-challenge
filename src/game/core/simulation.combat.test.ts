@@ -72,6 +72,34 @@ describe('player weapons', () => {
     expect(shotSlots(simulation.drainEvents())).toEqual(['front']);
   });
 
+  it('fires a triple volley fanned around the heading on its own cooldown', () => {
+    const simulation = new Simulation(openWaterConfig, 1);
+    const volley = { ...createIdleIntent(), fireVolley: true };
+    steps(simulation, 1, volley);
+
+    const { spreadRadians, projectileCount, cooldownSeconds } = openWaterConfig.player.volley;
+    const angles = simulation.projectiles.active
+      .map((projectile) => Math.atan2(projectile.velocity.y, projectile.velocity.x))
+      .sort((left, right) => left - right);
+    expect(angles).toHaveLength(projectileCount);
+    expect(angles[0]).toBeCloseTo(-spreadRadians);
+    expect(angles[1]).toBeCloseTo(0);
+    expect(angles[2]).toBeCloseTo(spreadRadians);
+    expect(shotSlots(simulation.drainEvents())).toEqual(['volley']);
+
+    steps(simulation, secondsToSteps(cooldownSeconds) - 2, volley);
+    expect(shotSlots(simulation.drainEvents())).toEqual([]);
+    steps(simulation, 3, volley);
+    expect(shotSlots(simulation.drainEvents())).toEqual(['volley']);
+  });
+
+  it('keeps the front cannon to a single projectile when the volley is not used', () => {
+    const simulation = new Simulation(openWaterConfig, 1);
+    steps(simulation, 1, { ...createIdleIntent(), fireFront: true });
+    expect(simulation.projectiles.active).toHaveLength(1);
+    expect(simulation.state.player.cooldowns.volley).toBe(0);
+  });
+
   it('removes projectiles once they exceed their range', () => {
     const simulation = new Simulation(openWaterConfig, 1);
     steps(simulation, 1, { ...createIdleIntent(), fireFront: true });
