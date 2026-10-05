@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useMatchSync, useRegistrationStatus } from '../../api/queries';
 import type { MatchOutcome } from '../../game/session/GameSession';
 import { Button } from '../../ui/Button';
@@ -11,7 +12,8 @@ interface ResultScreenProps {
 
 export function ResultScreen({ outcome, onPlayAgain, onMainMenu }: ResultScreenProps) {
   const registration = useRegistrationStatus(outcome.matchId);
-  const { retry } = useMatchSync();
+  const { retry, discard } = useMatchSync();
+  const [discarded, setDiscarded] = useState(false);
   const title = outcome.endReason === 'time' ? 'Battle complete' : 'Ship sunk';
 
   return (
@@ -35,8 +37,31 @@ export function ResultScreen({ outcome, onPlayAgain, onMainMenu }: ResultScreenP
         role="status"
         data-testid="registration-status"
       >
-        {registration.status === 'synced' && 'Battle recorded in the captain’s log.'}
+        {outcome.assisted && 'Assisted test battle: it is not sent to the captain’s log.'}
+        {!outcome.assisted &&
+          !discarded &&
+          registration.status === 'synced' &&
+          'Battle recorded in the captain’s log.'}
+        {discarded && 'Battle discarded.'}
         {registration.status === 'syncing' && 'Recording battle…'}
+        {registration.status === 'rejected' && (
+          <>
+            <span role="alert">
+              The server rejected this battle
+              {registration.error ? `: ${registration.error}` : '.'} It cannot be recorded.
+            </span>
+            <Button
+              size="small"
+              variant="secondary"
+              onClick={() => {
+                discard(outcome.matchId);
+                setDiscarded(true);
+              }}
+            >
+              Discard
+            </Button>
+          </>
+        )}
         {registration.status === 'pending' && (
           <>
             <span>

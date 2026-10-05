@@ -7,6 +7,7 @@ export interface PendingMatch {
   readonly submission: MatchSubmission;
   readonly attempts: number;
   readonly lastError: string | null;
+  readonly rejected: boolean;
 }
 
 type Listener = () => void;
@@ -28,14 +29,14 @@ class PendingMatchStore {
 
   add(submission: MatchSubmission): void {
     if (this.find(submission.matchId)) return;
-    this.update([...this.entries, { submission, attempts: 0, lastError: null }]);
+    this.update([...this.entries, { submission, attempts: 0, lastError: null, rejected: false }]);
   }
 
-  markAttempt(matchId: string, error: string | null): void {
+  markAttempt(matchId: string, error: string, rejected: boolean): void {
     this.update(
       this.entries.map((entry) =>
         entry.submission.matchId === matchId
-          ? { ...entry, attempts: entry.attempts + 1, lastError: error }
+          ? { ...entry, attempts: entry.attempts + 1, lastError: error, rejected }
           : entry,
       ),
     );
@@ -74,6 +75,7 @@ function parseEntries(value: unknown): PendingMatch[] | null {
         submission,
         attempts: typeof item.attempts === 'number' ? item.attempts : 0,
         lastError: typeof item.lastError === 'string' ? item.lastError : null,
+        rejected: item.rejected === true,
       },
     ];
   });

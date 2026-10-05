@@ -21,6 +21,7 @@ export interface MatchOutcome {
   readonly endReason: EndReason;
   readonly options: PlayerOptions;
   readonly endedAt: string;
+  readonly assisted: boolean;
 }
 
 export interface GameSessionOptions {
@@ -177,6 +178,7 @@ export class GameSession {
       endReason: state.endReason ?? 'time',
       options: this.options.options,
       endedAt: new Date().toISOString(),
+      assisted: this.options.invulnerablePlayer ?? false,
     });
   }
 

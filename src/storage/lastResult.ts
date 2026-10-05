@@ -13,7 +13,7 @@ export function saveLastResult(outcome: MatchOutcome): void {
 
 export function parseOutcome(value: unknown): MatchOutcome | null {
   if (!isRecord(value) || !isRecord(value.options)) return null;
-  const { matchId, seed, score, durationSeconds, endReason, endedAt, options } = value;
+  const { matchId, seed, score, durationSeconds, endReason, endedAt, options, assisted } = value;
   if (
     typeof matchId !== 'string' ||
     typeof seed !== 'number' ||
@@ -33,6 +33,7 @@ export function parseOutcome(value: unknown): MatchOutcome | null {
     durationSeconds,
     endReason,
     endedAt,
+    assisted: assisted === true,
     options: {
       matchDurationSeconds: options.matchDurationSeconds,
       spawnIntervalSeconds: options.spawnIntervalSeconds,

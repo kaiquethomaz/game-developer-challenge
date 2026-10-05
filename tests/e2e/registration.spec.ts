@@ -80,6 +80,34 @@ test.describe('match registration', () => {
     await expect(rows).toHaveCount(1);
   });
 
+  test('a battle rejected by the server can be discarded and is not retried', async ({ page }) => {
+    await finishBattle(page, 'client-error');
+    const status = page.getByTestId('registration-status');
+    await expect(status).toContainText('The server rejected this battle');
+    await page.getByRole('button', { name: 'Discard' }).click();
+    await expect(status).toContainText('Battle discarded.');
+
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await expect(page.getByText(/waiting to be recorded/)).toHaveCount(0);
+    const pending = await page.evaluate(() =>
+      localStorage.getItem('pirate-battle:pending-matches'),
+    );
+    expect(JSON.parse(pending ?? '[]')).toEqual([]);
+  });
+
+  test('assisted test battles are never sent to the captain’s log', async ({ page }) => {
+    await page.goto('/?e2e=1&clock=manual&seed=4&latency=0&invulnerable=1');
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
+    await page.waitForFunction(() => window.__pirateBattle !== undefined);
+    await page.evaluate(() => {
+      for (let i = 0; i < 121 * 60; i += 1) window.__pirateBattle?.advance(1 / 60);
+    });
+    await expect(page.getByTestId('registration-status')).toContainText('Assisted test battle');
+    const rows = await historyRows(page);
+    await expect(page.getByText('You have not finished a battle yet.')).toBeVisible();
+    await expect(rows).toHaveCount(0);
+  });
+
   test('repeated retry clicks do not duplicate the battle', async ({ page }) => {
     await finishBattle(page, 'record-unavailable');
     await expect(page.getByTestId('registration-status')).toContainText('Not recorded yet', {

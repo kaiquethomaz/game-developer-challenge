@@ -1,4 +1,4 @@
-import { usePendingMatches } from '../../api/queries';
+import { useWaitingMatchCount } from '../../api/queries';
 import { ACTION_KEY_HINTS, ACTION_LABELS, GAME_ACTIONS } from '../../game/input/actions';
 import type { MatchOutcome } from '../../game/session/GameSession';
 import { Button, RoundButton } from '../../ui/Button';
@@ -19,7 +19,7 @@ export function MainMenu({
   onOpenLog,
   onOpenNetworkLab,
 }: MainMenuProps) {
-  const pending = usePendingMatches();
+  const waiting = useWaitingMatchCount();
 
   return (
     <section className="panel menu" aria-labelledby="menu-title">
@@ -68,11 +68,11 @@ export function MainMenu({
           {endReasonLabel(lastResult.endReason)}
         </p>
       )}
-      {pending.length > 0 && (
+      {waiting > 0 && (
         <p className="status-text">
-          {pending.length === 1
+          {waiting === 1
             ? '1 battle is waiting to be recorded.'
-            : `${pending.length} battles are waiting to be recorded.`}
+            : `${waiting} battles are waiting to be recorded.`}
         </p>
       )}
 

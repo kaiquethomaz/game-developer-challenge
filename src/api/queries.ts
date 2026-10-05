@@ -70,7 +70,7 @@ export function useMatchSync() {
       pendingMatches.remove(record.matchId);
     },
     onError: (error, submission) => {
-      pendingMatches.markAttempt(submission.matchId, error.message);
+      pendingMatches.markAttempt(submission.matchId, error.message, !error.isTransient);
     },
     onSettled: async (_record, _error, submission) => {
       inFlight.delete(submission.matchId);
@@ -109,17 +109,27 @@ export function useMatchSync() {
   );
 
   const retryAll = useCallback(() => {
-    for (const entry of pendingMatches.getSnapshot()) send(entry.submission);
+    for (const entry of pendingMatches.getSnapshot()) {
+      if (!entry.rejected) send(entry.submission);
+    }
   }, [send]);
 
-  return { submit, retry, retryAll };
+  const discard = useCallback((matchId: string) => {
+    pendingMatches.remove(matchId);
+  }, []);
+
+  return { submit, retry, retryAll, discard };
 }
 
 export function usePendingMatches() {
   return useSyncExternalStore(pendingMatches.subscribe, pendingMatches.getSnapshot);
 }
 
-export type RegistrationStatus = 'syncing' | 'pending' | 'synced';
+export function useWaitingMatchCount(): number {
+  return usePendingMatches().filter((entry) => !entry.rejected).length;
+}
+
+export type RegistrationStatus = 'syncing' | 'pending' | 'rejected' | 'synced';
 
 export function useRegistrationStatus(matchId: string | null): {
   status: RegistrationStatus;
@@ -135,5 +145,6 @@ export function useRegistrationStatus(matchId: string | null): {
   const entry = pending.find((item) => item.submission.matchId === matchId);
   if (!entry) return { status: 'synced', error: null };
   if (syncing.includes(matchId)) return { status: 'syncing', error: entry.lastError };
+  if (entry.rejected) return { status: 'rejected', error: entry.lastError };
   return { status: 'pending', error: entry.lastError };
 }

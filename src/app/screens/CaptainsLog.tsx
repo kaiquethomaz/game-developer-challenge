@@ -194,23 +194,42 @@ function HistoryTab({
   const [page, setPage] = useState(1);
   const query = useHistory({ playerId: profile.playerId, page, pageSize: DEFAULT_PAGE_SIZE });
   const pending = usePendingMatches();
-  const { retryAll } = useMatchSync();
+  const waiting = pending.filter((entry) => !entry.rejected).length;
+  const rejected = pending.filter((entry) => entry.rejected);
+  const { retryAll, discard } = useMatchSync();
 
   return (
     <>
       <p className="panel__subtitle">{profile.captainName} · Your recent battles</p>
-      {pending.length > 0 && (
+      {waiting > 0 && (
         <div className="log__pending" role="status">
           <span>
-            {pending.length === 1
+            {waiting === 1
               ? '1 battle is waiting to be recorded.'
-              : `${pending.length} battles are waiting to be recorded.`}
+              : `${waiting} battles are waiting to be recorded.`}
           </span>
           <Button size="small" variant="secondary" onClick={retryAll}>
             Retry now
           </Button>
         </div>
       )}
+      {rejected.map((entry) => (
+        <div key={entry.submission.matchId} className="log__pending" role="alert">
+          <span>
+            A battle with {entry.submission.score} points was rejected by the server
+            {entry.lastError ? `: ${entry.lastError}` : '.'}
+          </span>
+          <Button
+            size="small"
+            variant="secondary"
+            onClick={() => {
+              discard(entry.submission.matchId);
+            }}
+          >
+            Discard
+          </Button>
+        </div>
+      ))}
       <QueryState
         query={query}
         label="match history"
