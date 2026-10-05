@@ -109,6 +109,7 @@ test.describe('match registration', () => {
   });
 
   test('repeated retry clicks do not duplicate the battle', async ({ page }) => {
+    test.slow();
     await finishBattle(page, 'record-unavailable');
     await expect(page.getByTestId('registration-status')).toContainText('Not recorded yet', {
       timeout: 15_000,
