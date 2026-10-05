@@ -53,6 +53,7 @@ describe('match rules', () => {
     const config = createMatchConfig({
       matchDurationSeconds: 60,
       spawnIntervalSeconds: 1,
+      difficulty: 'open',
     });
     const simulation = new Simulation(config, 5);
     const holdAll: PlayerIntent = {

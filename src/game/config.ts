@@ -115,9 +115,26 @@ export interface GameConfig {
   readonly shooter: ShooterConfig;
 }
 
+export const DIFFICULTIES = ['calm', 'open', 'kraken'] as const;
+export type Difficulty = (typeof DIFFICULTIES)[number];
+
+export function isDifficulty(value: unknown): value is Difficulty {
+  return typeof value === 'string' && (DIFFICULTIES as readonly string[]).includes(value);
+}
+
 export interface PlayerOptions {
   readonly matchDurationSeconds: number;
   readonly spawnIntervalSeconds: number;
+  readonly difficulty: Difficulty;
+}
+
+export interface DifficultyPreset {
+  readonly label: string;
+  readonly description: string;
+  readonly maxAlive: MatchRamp<number>;
+  readonly distribution: MatchRamp<EnemyDistribution>;
+  readonly enemyDamageScale: number;
+  readonly salvageChanceScale: number;
 }
 
 export interface NumericLimit {
@@ -126,14 +143,56 @@ export interface NumericLimit {
   readonly step: number;
 }
 
+type NumericOption = Exclude<keyof PlayerOptions, 'difficulty'>;
+
 export const OPTION_LIMITS = {
   matchDurationSeconds: { min: 60, max: 180, step: 1 },
   spawnIntervalSeconds: { min: 1, max: 10, step: 0.5 },
-} as const satisfies Record<keyof PlayerOptions, NumericLimit>;
+} as const satisfies Record<NumericOption, NumericLimit>;
 
 export const DEFAULT_PLAYER_OPTIONS: PlayerOptions = {
   matchDurationSeconds: 120,
   spawnIntervalSeconds: 3,
+  difficulty: 'open',
+};
+
+const OPEN_SEA_MAX_ALIVE: MatchRamp<number> = { start: 4, end: 10 };
+const OPEN_SEA_DISTRIBUTION: MatchRamp<EnemyDistribution> = {
+  start: { chaser: 0.6, shooter: 0.4 },
+  end: { chaser: 0.4, shooter: 0.6 },
+};
+
+export const DIFFICULTY_PRESETS: Readonly<Record<Difficulty, DifficultyPreset>> = {
+  calm: {
+    label: 'Calm Waters',
+    description: 'Fewer ships at once, gentler cannons and more salvage.',
+    maxAlive: { start: 3, end: 6 },
+    distribution: {
+      start: { chaser: 0.7, shooter: 0.3 },
+      end: { chaser: 0.55, shooter: 0.45 },
+    },
+    enemyDamageScale: 0.75,
+    salvageChanceScale: 1.4,
+  },
+  open: {
+    label: 'Open Sea',
+    description: 'The standard battle: pressure builds steadily as the clock runs.',
+    maxAlive: OPEN_SEA_MAX_ALIVE,
+    distribution: OPEN_SEA_DISTRIBUTION,
+    enemyDamageScale: 1,
+    salvageChanceScale: 1,
+  },
+  kraken: {
+    label: "Kraken's Wrath",
+    description: 'Crowded waters, more shooters and heavier hits.',
+    maxAlive: { start: 6, end: 14 },
+    distribution: {
+      start: { chaser: 0.5, shooter: 0.5 },
+      end: { chaser: 0.3, shooter: 0.7 },
+    },
+    enemyDamageScale: 1.3,
+    salvageChanceScale: 0.8,
+  },
 };
 
 const TILE_SIZE = 64;
@@ -159,14 +218,11 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
   spawn: {
     intervalSeconds: DEFAULT_PLAYER_OPTIONS.spawnIntervalSeconds,
     initialDelaySeconds: 1.5,
-    maxAlive: { start: 4, end: 10 },
+    maxAlive: OPEN_SEA_MAX_ALIVE,
     minDistanceFromPlayer: 520,
     clearance: 8,
     candidateAttempts: 48,
-    distribution: {
-      start: { chaser: 0.6, shooter: 0.4 },
-      end: { chaser: 0.4, shooter: 0.6 },
-    },
+    distribution: OPEN_SEA_DISTRIBUTION,
   },
   salvage: {
     dropChance: 0.35,
@@ -257,7 +313,7 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
   },
 };
 
-export function clampOption(key: keyof PlayerOptions, value: number): number {
+export function clampOption(key: NumericOption, value: number): number {
   if (!Number.isFinite(value)) return DEFAULT_PLAYER_OPTIONS[key];
   const { min, max } = OPTION_LIMITS[key];
   return Math.min(max, Math.max(min, value));
@@ -267,12 +323,27 @@ export function createMatchConfig(
   options: PlayerOptions,
   base: GameConfig = DEFAULT_GAME_CONFIG,
 ): GameConfig {
+  const preset = DIFFICULTY_PRESETS[options.difficulty];
+  const scaleDamage = (damage: number) => Math.round(damage * preset.enemyDamageScale);
+  const scaleChance = (chance: number) => Math.min(1, chance * preset.salvageChanceScale);
   return {
     ...base,
     matchDurationSeconds: clampOption('matchDurationSeconds', options.matchDurationSeconds),
     spawn: {
       ...base.spawn,
       intervalSeconds: clampOption('spawnIntervalSeconds', options.spawnIntervalSeconds),
+      maxAlive: preset.maxAlive,
+      distribution: preset.distribution,
+    },
+    chaser: { ...base.chaser, contactDamage: scaleDamage(base.chaser.contactDamage) },
+    shooter: {
+      ...base.shooter,
+      cannon: { ...base.shooter.cannon, damage: scaleDamage(base.shooter.cannon.damage) },
+    },
+    salvage: {
+      ...base.salvage,
+      dropChance: scaleChance(base.salvage.dropChance),
+      lowHealthDropChance: scaleChance(base.salvage.lowHealthDropChance),
     },
   };
 }

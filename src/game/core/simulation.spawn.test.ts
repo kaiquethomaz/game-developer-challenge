@@ -91,7 +91,7 @@ describe('spawn pressure over the match', () => {
 
   it('never keeps more enemies alive than the current cap', () => {
     const simulation = new Simulation(
-      createMatchConfig({ matchDurationSeconds: 60, spawnIntervalSeconds: 1 }),
+      createMatchConfig({ matchDurationSeconds: 60, spawnIntervalSeconds: 1, difficulty: 'open' }),
       5,
     );
     const idle = createIdleIntent();
