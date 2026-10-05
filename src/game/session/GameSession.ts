@@ -30,6 +30,7 @@ export interface GameSessionOptions {
   readonly textures: GameTextures;
   readonly clock: ClockMode;
   readonly reducedMotion: boolean;
+  readonly invulnerablePlayer?: boolean;
   readonly onEnd: (outcome: MatchOutcome) => void;
 }
 
@@ -51,7 +52,9 @@ export class GameSession {
   private skipNextFrame = false;
 
   constructor(private readonly options: GameSessionOptions) {
-    this.simulation = new Simulation(options.config, options.seed);
+    this.simulation = new Simulation(options.config, options.seed, {
+      invulnerablePlayer: options.invulnerablePlayer ?? false,
+    });
     this.accumulator = new FixedStepAccumulator({
       stepSeconds: options.config.fixedStepSeconds,
       maxFrameSeconds: options.config.maxFrameSeconds,

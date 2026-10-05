@@ -4,6 +4,7 @@ export interface E2EOptions {
   readonly enabled: boolean;
   readonly seed: number | null;
   readonly manualClock: boolean;
+  readonly invulnerablePlayer: boolean;
 }
 
 export interface GameStateProbe {
@@ -64,6 +65,7 @@ export function readE2EOptions(search = window.location.search): E2EOptions {
     enabled,
     seed: enabled && Number.isInteger(seed) && params.has('seed') ? seed : null,
     manualClock: enabled && params.get('clock') === 'manual',
+    invulnerablePlayer: enabled && params.get('invulnerable') === '1',
   };
 }
 

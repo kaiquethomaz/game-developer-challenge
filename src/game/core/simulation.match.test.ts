@@ -129,3 +129,13 @@ describe('match rules', () => {
     expect(second.projectiles.active).toHaveLength(0);
   });
 });
+
+describe('profiling instrumentation', () => {
+  it('keeps an invulnerable player alive while every other rule still applies', () => {
+    const simulation = new Simulation(DEFAULT_GAME_CONFIG, 4, { invulnerablePlayer: true });
+    runSeconds(simulation, 40);
+    expect(simulation.state.status).toBe('running');
+    expect(simulation.state.player.health).toBe(DEFAULT_GAME_CONFIG.player.maxHealth);
+    expect(simulation.state.enemies.length).toBeGreaterThan(0);
+  });
+});

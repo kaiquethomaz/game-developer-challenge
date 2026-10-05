@@ -115,6 +115,7 @@ function Battle({
       textures,
       clock: e2e.manualClock ? 'manual' : 'realtime',
       reducedMotion: startReducedMotion,
+      invulnerablePlayer: e2e.invulnerablePlayer,
       onEnd: (outcome) => {
         notifyMatchEnd(outcome);
       },

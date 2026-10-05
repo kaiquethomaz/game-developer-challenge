@@ -24,6 +24,10 @@ export interface SimulationState {
   readonly enemies: Ship[];
 }
 
+export interface SimulationOptions {
+  readonly invulnerablePlayer?: boolean;
+}
+
 export class Simulation {
   readonly arena: Arena;
   readonly state: SimulationState;
@@ -39,6 +43,7 @@ export class Simulation {
   constructor(
     readonly config: GameConfig,
     readonly seed: number,
+    private readonly options: SimulationOptions = {},
   ) {
     this.arena = new Arena(config.arena);
     this.random = createRandom(seed);
@@ -310,6 +315,7 @@ export class Simulation {
 
   private applyDamage(ship: Ship, amount: number, cause: DestroyCause): void {
     if (!ship.alive || this.state.status !== 'running') return;
+    if (ship.kind === 'player' && this.options.invulnerablePlayer) return;
 
     ship.health = Math.max(0, ship.health - amount);
 
