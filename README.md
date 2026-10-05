@@ -111,7 +111,7 @@ npm test
 npm run test:e2e
 ```
 
-The Playwright suite runs against the production build (`vite preview`) on two projects: **desktop Chromium** (1280×720) and **mobile Chromium** (Pixel 7 landscape). It covers the twelve areas listed in the challenge, including visual regression baselines for the menu, a stable arena and the result screen in `tests/e2e/__screenshots__/`. The HTML report is written to `playwright-report/`, and traces and videos are kept for failed tests in `test-results/`.
+The Playwright suite runs against the production build (`vite preview`) on two projects: **desktop Chromium** (1280×720) and **mobile Chromium** (Pixel 7 landscape). It covers the twelve areas listed in the challenge, including visual regression baselines for the menu, a stable arena and the result screen in `tests/e2e/__screenshots__/`. Reports from the last full run are versioned in [docs/reports](docs/reports/README.md). The HTML report is written to `playwright-report/`, and traces and videos are kept for failed tests in `test-results/`.
 
 Determinism comes from an opt-in probe enabled with `?e2e=1`:
 

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="62" failures="0" errors="0" time="1.7436731">
+    <testsuite name="src/api/client.test.ts" timestamp="2026-10-05T17:55:55.222Z" hostname="Kaique" tests="3" failures="0" errors="0" skipped="0" time="0.0043406">
+        <testcase classname="src/api/client.test.ts" name="toApiError &gt; classifies timeouts, network failures and http errors" time="0.0025195">
+        </testcase>
+        <testcase classname="src/api/client.test.ts" name="retry policy &gt; retries transient failures a limited number of times" time="0.000344">
+        </testcase>
+        <testcase classname="src/api/client.test.ts" name="retry policy &gt; does not retry client errors" time="0.0002069">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/config.test.ts" timestamp="2026-10-05T17:55:55.229Z" hostname="Kaique" tests="4" failures="0" errors="0" skipped="0" time="0.0050245">
+        <testcase classname="src/game/config.test.ts" name="player options &gt; clamps values to the documented limits" time="0.0023502">
+        </testcase>
+        <testcase classname="src/game/config.test.ts" name="player options &gt; falls back to defaults for non-finite values" time="0.0002625">
+        </testcase>
+        <testcase classname="src/game/config.test.ts" name="player options &gt; builds a match snapshot without mutating the base config" time="0.0002915">
+        </testcase>
+        <testcase classname="src/game/config.test.ts" name="player options &gt; keeps spawns outside the shooter attack range by default" time="0.0002435">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/arena.test.ts" timestamp="2026-10-05T17:55:55.230Z" hostname="Kaique" tests="5" failures="0" errors="0" skipped="0" time="0.006395">
+        <testcase classname="src/game/core/arena.test.ts" name="Arena &gt; converts tile islands to world rectangles" time="0.002672">
+        </testcase>
+        <testcase classname="src/game/core/arena.test.ts" name="Arena &gt; pushes a circle out of an island edge" time="0.0006708">
+        </testcase>
+        <testcase classname="src/game/core/arena.test.ts" name="Arena &gt; pushes a circle whose center entered an island out through the nearest side" time="0.0003781">
+        </testcase>
+        <testcase classname="src/game/core/arena.test.ts" name="Arena &gt; keeps circles inside the arena bounds" time="0.0003843">
+        </testcase>
+        <testcase classname="src/game/core/arena.test.ts" name="Arena &gt; detects blocked and clear lines of sight" time="0.0004023">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/fixedStep.test.ts" timestamp="2026-10-05T17:55:55.231Z" hostname="Kaique" tests="3" failures="0" errors="0" skipped="0" time="0.0059127">
+        <testcase classname="src/game/core/fixedStep.test.ts" name="FixedStepAccumulator &gt; simulates the same time regardless of frame rate" time="0.0030851">
+        </testcase>
+        <testcase classname="src/game/core/fixedStep.test.ts" name="FixedStepAccumulator &gt; clamps long frames to avoid a spiral of death" time="0.0004621">
+        </testcase>
+        <testcase classname="src/game/core/fixedStep.test.ts" name="FixedStepAccumulator &gt; drops leftover time on reset" time="0.0002984">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/navigation.test.ts" timestamp="2026-10-05T17:55:55.232Z" hostname="Kaique" tests="2" failures="0" errors="0" skipped="0" time="0.0064613">
+        <testcase classname="src/game/core/navigation.test.ts" name="FlowField &gt; marks island cells as blocked" time="0.0015408">
+        </testcase>
+        <testcase classname="src/game/core/navigation.test.ts" name="FlowField &gt; routes around an island instead of through it" time="0.0034585">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/random.test.ts" timestamp="2026-10-05T17:55:55.233Z" hostname="Kaique" tests="3" failures="0" errors="0" skipped="0" time="0.0229872">
+        <testcase classname="src/game/core/random.test.ts" name="createRandom &gt; produces the same sequence for the same seed" time="0.0019575">
+        </testcase>
+        <testcase classname="src/game/core/random.test.ts" name="createRandom &gt; produces different sequences for different seeds" time="0.0002573">
+        </testcase>
+        <testcase classname="src/game/core/random.test.ts" name="createRandom &gt; stays within the requested range" time="0.0192163">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/simulation.combat.test.ts" timestamp="2026-10-05T17:55:55.235Z" hostname="Kaique" tests="7" failures="0" errors="0" skipped="0" time="0.0739629">
+        <testcase classname="src/game/core/simulation.combat.test.ts" name="player weapons &gt; fires a single front projectile along the heading" time="0.0128991">
+        </testcase>
+        <testcase classname="src/game/core/simulation.combat.test.ts" name="player weapons &gt; fires three parallel side projectiles to each side" time="0.0164259">
+        </testcase>
+        <testcase classname="src/game/core/simulation.combat.test.ts" name="player weapons &gt; respects the cooldown of each weapon independently" time="0.0110318">
+        </testcase>
+        <testcase classname="src/game/core/simulation.combat.test.ts" name="player weapons &gt; removes projectiles once they exceed their range" time="0.0077571">
+        </testcase>
+        <testcase classname="src/game/core/simulation.combat.test.ts" name="player weapons &gt; stops projectiles at islands" time="0.0066759">
+        </testcase>
+        <testcase classname="src/game/core/simulation.combat.test.ts" name="damage and scoring &gt; damages an enemy once per projectile and scores one point on destruction" time="0.0123983">
+        </testcase>
+        <testcase classname="src/game/core/simulation.combat.test.ts" name="damage and scoring &gt; awards a single point when a broadside overkills an enemy" time="0.0040676">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/simulation.enemies.test.ts" timestamp="2026-10-05T17:55:55.236Z" hostname="Kaique" tests="6" failures="0" errors="0" skipped="0" time="0.2876341">
+        <testcase classname="src/game/core/simulation.enemies.test.ts" name="chaser &gt; pursues the player and explodes on impact without scoring" time="0.0694001">
+        </testcase>
+        <testcase classname="src/game/core/simulation.enemies.test.ts" name="chaser &gt; navigates around an island to reach the player" time="0.0662649">
+        </testcase>
+        <testcase classname="src/game/core/simulation.enemies.test.ts" name="shooter &gt; approaches to its preferred range and fires once in attack range" time="0.0827034">
+        </testcase>
+        <testcase classname="src/game/core/simulation.enemies.test.ts" name="shooter &gt; holds fire while out of range" time="0.0048993">
+        </testcase>
+        <testcase classname="src/game/core/simulation.enemies.test.ts" name="shooter &gt; respects the cannon cooldown" time="0.0347242">
+        </testcase>
+        <testcase classname="src/game/core/simulation.enemies.test.ts" name="destroyed enemies &gt; stop colliding and firing" time="0.0264405">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/simulation.match.test.ts" timestamp="2026-10-05T17:55:55.237Z" hostname="Kaique" tests="7" failures="0" errors="0" skipped="0" time="0.6661804">
+        <testcase classname="src/game/core/simulation.match.test.ts" name="match rules &gt; ends by time exactly at the configured duration" time="0.303277">
+        </testcase>
+        <testcase classname="src/game/core/simulation.match.test.ts" name="match rules &gt; ends by death when health reaches zero" time="0.0093802">
+        </testcase>
+        <testcase classname="src/game/core/simulation.match.test.ts" name="match rules &gt; freezes movement, attacks, spawns and scoring after the end" time="0.1227991">
+        </testcase>
+        <testcase classname="src/game/core/simulation.match.test.ts" name="match rules &gt; emits nothing after the ended event within the final step" time="0.0014733">
+        </testcase>
+        <testcase classname="src/game/core/simulation.match.test.ts" name="match rules &gt; emits a single ended event" time="0.0549723">
+        </testcase>
+        <testcase classname="src/game/core/simulation.match.test.ts" name="match rules &gt; starts every new match from a clean state" time="0.0261296">
+        </testcase>
+        <testcase classname="src/game/core/simulation.match.test.ts" name="profiling instrumentation &gt; keeps an invulnerable player alive while every other rule still applies" time="0.145506">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/simulation.movement.test.ts" timestamp="2026-10-05T17:55:55.238Z" hostname="Kaique" tests="5" failures="0" errors="0" skipped="0" time="0.1933579">
+        <testcase classname="src/game/core/simulation.movement.test.ts" name="player movement &gt; moves forward along its heading" time="0.023622">
+        </testcase>
+        <testcase classname="src/game/core/simulation.movement.test.ts" name="player movement &gt; rotates both ways without moving when not thrusting" time="0.0183845">
+        </testcase>
+        <testcase classname="src/game/core/simulation.movement.test.ts" name="player movement &gt; reaches the same position at different frame rates" time="0.0263417">
+        </testcase>
+        <testcase classname="src/game/core/simulation.movement.test.ts" name="player movement &gt; stays inside the arena bounds" time="0.0667798">
+        </testcase>
+        <testcase classname="src/game/core/simulation.movement.test.ts" name="player movement &gt; cannot sail through an island" time="0.0541966">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/core/simulation.spawn.test.ts" timestamp="2026-10-05T17:55:55.239Z" hostname="Kaique" tests="4" failures="0" errors="0" skipped="0" time="0.4403521">
+        <testcase classname="src/game/core/simulation.spawn.test.ts" name="enemy spawning &gt; spawns on the configured interval after the initial delay" time="0.0852799">
+        </testcase>
+        <testcase classname="src/game/core/simulation.spawn.test.ts" name="enemy spawning &gt; spawns both enemy types within the first two spawns" time="0.1404973">
+        </testcase>
+        <testcase classname="src/game/core/simulation.spawn.test.ts" name="enemy spawning &gt; places enemies away from the player and off islands" time="0.0933671">
+        </testcase>
+        <testcase classname="src/game/core/simulation.spawn.test.ts" name="enemy spawning &gt; is deterministic for the same seed" time="0.1186566">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/game/input/InputController.test.ts" timestamp="2026-10-05T17:55:55.240Z" hostname="Kaique" tests="3" failures="0" errors="0" skipped="0" time="0.0045991">
+        <testcase classname="src/game/input/InputController.test.ts" name="InputController &gt; combines simultaneous movement and fire actions" time="0.002107">
+        </testcase>
+        <testcase classname="src/game/input/InputController.test.ts" name="InputController &gt; keeps an action held while any source still holds it" time="0.0004998">
+        </testcase>
+        <testcase classname="src/game/input/InputController.test.ts" name="InputController &gt; cancels opposite turns and clears everything on release all" time="0.000378">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/mocks/matchStore.test.ts" timestamp="2026-10-05T17:55:55.241Z" hostname="Kaique" tests="6" failures="0" errors="0" skipped="0" time="0.0202488">
+        <testcase classname="src/mocks/matchStore.test.ts" name="saveMatch &gt; creates a record once and returns the existing one on resubmission" time="0.0027195">
+        </testcase>
+        <testcase classname="src/mocks/matchStore.test.ts" name="saveMatch &gt; flags a conflicting payload for an existing match id" time="0.0004099">
+        </testcase>
+        <testcase classname="src/mocks/matchStore.test.ts" name="queryRanking &gt; only compares matches with the same configuration" time="0.0008308">
+        </testcase>
+        <testcase classname="src/mocks/matchStore.test.ts" name="queryRanking &gt; orders by score and breaks ties deterministically" time="0.0004207">
+        </testcase>
+        <testcase classname="src/mocks/matchStore.test.ts" name="queryRanking &gt; paginates and clamps out of range pages" time="0.0003696">
+        </testcase>
+        <testcase classname="src/mocks/matchStore.test.ts" name="queryHistory &gt; returns only the player matches, newest first" time="0.0137497">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/storage/settings.test.ts" timestamp="2026-10-05T17:55:55.242Z" hostname="Kaique" tests="4" failures="0" errors="0" skipped="0" time="0.0062165">
+        <testcase classname="src/storage/settings.test.ts" name="validateOptions &gt; accepts values within the documented limits" time="0.0020345">
+        </testcase>
+        <testcase classname="src/storage/settings.test.ts" name="validateOptions &gt; rejects durations outside 60 to 180 seconds and non integers" time="0.0010679">
+        </testcase>
+        <testcase classname="src/storage/settings.test.ts" name="validateOptions &gt; requires a positive spawn interval on the half-second step" time="0.0010876">
+        </testcase>
+        <testcase classname="src/storage/settings.test.ts" name="validateOptions &gt; validates the captain name length" time="0.0002379">
+        </testcase>
+    </testsuite>
+</testsuites>
