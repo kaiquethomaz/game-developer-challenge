@@ -18,6 +18,7 @@ function run(simulation: Simulation, seconds: number, intent: PlayerIntent, fram
 
 const openWaterConfig: GameConfig = {
   ...DEFAULT_GAME_CONFIG,
+  spawn: { ...DEFAULT_GAME_CONFIG.spawn, initialDelaySeconds: Number.POSITIVE_INFINITY },
   arena: {
     ...DEFAULT_GAME_CONFIG.arena,
     islands: [],

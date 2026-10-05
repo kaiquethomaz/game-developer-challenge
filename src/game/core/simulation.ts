@@ -3,10 +3,12 @@ import { Arena } from './arena';
 import { separateShips, updateChaser, updateShooter, type SteeringContext } from './enemies';
 import type { EnemyKind, Faction, PlayerIntent, Ship, ShipKind, WeaponSlot } from './entities';
 import type { DestroyCause, EndReason, SimulationEvent } from './events';
-import { distanceSquared, type Vec2 } from './math';
+import { angleTo, distanceSquared, type Vec2 } from './math';
 import { moveShip } from './movement';
 import { FlowField } from './navigation';
 import { ProjectilePool } from './projectiles';
+import { createRandom, type Random } from './random';
+import { EnemySpawner, findSpawnPoint } from './spawner';
 import { fireBroadside, fireFront, tickCooldowns, type ShotOrigin } from './weapons';
 
 export type MatchStatus = 'running' | 'ended';
@@ -29,12 +31,16 @@ export class Simulation {
   private wasPlayerBlocked = false;
   private readonly flowField: FlowField;
   private navigationTimer = 0;
+  private readonly random: Random;
+  private readonly spawner: EnemySpawner;
 
   constructor(
     readonly config: GameConfig,
     readonly seed: number,
   ) {
     this.arena = new Arena(config.arena);
+    this.random = createRandom(seed);
+    this.spawner = new EnemySpawner(config.spawn, this.random);
     this.flowField = new FlowField(
       this.arena,
       Math.max(config.chaser.radius, config.shooter.radius) + 2,
@@ -59,6 +65,7 @@ export class Simulation {
 
     this.state.elapsedSeconds += dt;
     this.updatePlayer(dt, intent);
+    this.updateSpawns(dt);
     this.updateNavigation(dt);
     this.updateEnemies(dt);
     this.resolveShipContacts();
@@ -137,6 +144,22 @@ export class Simulation {
         fireBroadside(player, config.broadside, 'right', 'player', this.projectiles),
       );
     }
+  }
+
+  private updateSpawns(dt: number): void {
+    const kind = this.spawner.update(dt, this.state.enemies.length);
+    if (!kind) return;
+
+    const { player, enemies } = this.state;
+    const point = findSpawnPoint(
+      this.arena,
+      player,
+      enemies,
+      this.config[kind].radius,
+      this.config.spawn.minDistanceFromPlayer,
+      this.random,
+    );
+    if (point) this.spawnEnemy(kind, point, angleTo(point, player.position));
   }
 
   private updateNavigation(dt: number): void {

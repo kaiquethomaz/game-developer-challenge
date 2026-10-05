@@ -1,0 +1,89 @@
+import type { SpawnConfig } from '../config';
+import type { Arena } from './arena';
+import type { EnemyKind, Ship } from './entities';
+import { distanceSquared, type Vec2 } from './math';
+import type { Random } from './random';
+
+const RANDOM_ATTEMPTS = 48;
+const SPAWN_PADDING = 8;
+
+export class EnemySpawner {
+  private timer: number;
+  private readonly spawned: Record<EnemyKind, number> = { chaser: 0, shooter: 0 };
+
+  constructor(
+    private readonly config: SpawnConfig,
+    private readonly random: Random,
+  ) {
+    this.timer = config.initialDelaySeconds;
+  }
+
+  get spawnedCount(): Readonly<Record<EnemyKind, number>> {
+    return this.spawned;
+  }
+
+  update(dt: number, aliveCount: number): EnemyKind | null {
+    this.timer -= dt;
+    if (this.timer > 0) return null;
+
+    this.timer += this.config.intervalSeconds;
+    if (aliveCount >= this.config.maxAlive) return null;
+
+    const kind = this.chooseKind();
+    this.spawned[kind] += 1;
+    return kind;
+  }
+
+  private chooseKind(): EnemyKind {
+    const total = this.spawned.chaser + this.spawned.shooter;
+    if (total === 1) {
+      return this.spawned.chaser === 1 ? 'shooter' : 'chaser';
+    }
+    const { chaser, shooter } = this.config.distribution;
+    return this.random.next() * (chaser + shooter) < chaser ? 'chaser' : 'shooter';
+  }
+}
+
+export function findSpawnPoint(
+  arena: Arena,
+  player: Ship,
+  enemies: readonly Ship[],
+  radius: number,
+  minDistanceFromPlayer: number,
+  random: Random,
+): Vec2 | null {
+  const isFree = (point: Vec2): boolean =>
+    !arena.isCircleBlocked(point, radius + SPAWN_PADDING) &&
+    enemies.every((enemy) => {
+      const reach = enemy.radius + radius + SPAWN_PADDING;
+      return distanceSquared(enemy.position, point) >= reach * reach;
+    });
+
+  const minimumSquared = minDistanceFromPlayer * minDistanceFromPlayer;
+  const margin = radius + SPAWN_PADDING;
+
+  for (let attempt = 0; attempt < RANDOM_ATTEMPTS; attempt += 1) {
+    const candidate = {
+      x: random.range(margin, arena.width - margin),
+      y: random.range(margin, arena.height - margin),
+    };
+    if (distanceSquared(candidate, player.position) >= minimumSquared && isFree(candidate)) {
+      return candidate;
+    }
+  }
+
+  let farthest: Vec2 | null = null;
+  let farthestDistance = -1;
+  const step = arena.tileSize / 2;
+  for (let y = margin; y <= arena.height - margin; y += step) {
+    for (let x = margin; x <= arena.width - margin; x += step) {
+      const candidate = { x, y };
+      const candidateDistance = distanceSquared(candidate, player.position);
+      if (candidateDistance > farthestDistance && isFree(candidate)) {
+        farthest = candidate;
+        farthestDistance = candidateDistance;
+      }
+    }
+  }
+  return farthest;
+}

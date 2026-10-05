@@ -8,6 +8,7 @@ const STEP = DEFAULT_GAME_CONFIG.fixedStepSeconds;
 
 const openWaterConfig: GameConfig = {
   ...DEFAULT_GAME_CONFIG,
+  spawn: { ...DEFAULT_GAME_CONFIG.spawn, initialDelaySeconds: Number.POSITIVE_INFINITY },
   arena: {
     ...DEFAULT_GAME_CONFIG.arena,
     islands: [],
