@@ -1,3 +1,4 @@
+import { DEFAULT_PLAYER_OPTIONS, isDifficulty } from '../game/config';
 import type { MatchOutcome } from '../game/session/GameSession';
 import { isRecord, readJson, writeJson } from './localStore';
 
@@ -37,6 +38,9 @@ export function parseOutcome(value: unknown): MatchOutcome | null {
     options: {
       matchDurationSeconds: options.matchDurationSeconds,
       spawnIntervalSeconds: options.spawnIntervalSeconds,
+      difficulty: isDifficulty(options.difficulty)
+        ? options.difficulty
+        : DEFAULT_PLAYER_OPTIONS.difficulty,
     },
   };
 }

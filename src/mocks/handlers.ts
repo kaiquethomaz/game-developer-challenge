@@ -1,6 +1,8 @@
 import { delay, http, HttpResponse, type RequestHandler } from 'msw';
+import { isDifficulty } from '../game/config';
 import {
   API_ROUTES,
+  parseDifficulty,
   DEFAULT_PAGE_SIZE,
   MAX_PAGE_SIZE,
   parseMatchSubmission,
@@ -24,11 +26,13 @@ export const handlers: RequestHandler[] = [
     const url = new URL(request.url);
     const duration = Number(url.searchParams.get('matchDurationSeconds'));
     const interval = Number(url.searchParams.get('spawnIntervalSeconds'));
+    const difficulty = url.searchParams.get('difficulty');
     if (
       !Number.isFinite(duration) ||
       !Number.isFinite(interval) ||
       duration <= 0 ||
-      interval <= 0
+      interval <= 0 ||
+      (difficulty !== null && !isDifficulty(difficulty))
     ) {
       return errorResponse(400, 'invalid_query', 'A valid match configuration is required.');
     }
@@ -36,7 +40,11 @@ export const handlers: RequestHandler[] = [
     return HttpResponse.json(
       queryRanking(
         mockBackend.allRecords(),
-        { matchDurationSeconds: duration, spawnIntervalSeconds: interval },
+        {
+          matchDurationSeconds: duration,
+          spawnIntervalSeconds: interval,
+          difficulty: parseDifficulty(difficulty),
+        },
         readPage(url),
         readPageSize(url),
       ),

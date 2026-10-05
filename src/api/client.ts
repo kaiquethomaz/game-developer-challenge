@@ -73,6 +73,7 @@ export async function fetchRanking(
       pageSize: query.pageSize,
       matchDurationSeconds: query.config.matchDurationSeconds,
       spawnIntervalSeconds: query.config.spawnIntervalSeconds,
+      difficulty: query.config.difficulty,
     },
     signal,
   });

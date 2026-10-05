@@ -44,7 +44,11 @@ export interface GameStateProbe {
     readonly height: number;
     readonly islands: readonly { x: number; y: number; width: number; height: number }[];
   };
-  readonly config: { readonly matchDurationSeconds: number; readonly spawnIntervalSeconds: number };
+  readonly config: {
+    readonly matchDurationSeconds: number;
+    readonly spawnIntervalSeconds: number;
+    readonly maxAlive: { readonly start: number; readonly end: number };
+  };
   readonly render: {
     readonly ships: number;
     readonly projectiles: number;
@@ -131,6 +135,7 @@ function describe(session: GameSession): GameStateProbe {
     config: {
       matchDurationSeconds: config.matchDurationSeconds,
       spawnIntervalSeconds: config.spawn.intervalSeconds,
+      maxAlive: { ...config.spawn.maxAlive },
     },
     render: session.renderStats,
   };

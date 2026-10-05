@@ -1,3 +1,4 @@
+import { DEFAULT_PLAYER_OPTIONS, isDifficulty, type Difficulty } from '../game/config';
 import { isRecord } from '../storage/localStore';
 
 export type MatchEndReason = 'time' | 'death';
@@ -5,6 +6,7 @@ export type MatchEndReason = 'time' | 'death';
 export interface MatchConfigSnapshot {
   readonly matchDurationSeconds: number;
   readonly spawnIntervalSeconds: number;
+  readonly difficulty: Difficulty;
 }
 
 export interface MatchSubmission {
@@ -82,7 +84,8 @@ export function parseMatchSubmission(value: unknown): MatchSubmission | null {
     durationSeconds < 0 ||
     (endReason !== 'time' && endReason !== 'death') ||
     typeof config.matchDurationSeconds !== 'number' ||
-    typeof config.spawnIntervalSeconds !== 'number'
+    typeof config.spawnIntervalSeconds !== 'number' ||
+    (config.difficulty !== undefined && !isDifficulty(config.difficulty))
   ) {
     return null;
   }
@@ -97,6 +100,11 @@ export function parseMatchSubmission(value: unknown): MatchSubmission | null {
     config: {
       matchDurationSeconds: config.matchDurationSeconds,
       spawnIntervalSeconds: config.spawnIntervalSeconds,
+      difficulty: parseDifficulty(config.difficulty),
     },
   };
+}
+
+export function parseDifficulty(value: unknown): Difficulty {
+  return isDifficulty(value) ? value : DEFAULT_PLAYER_OPTIONS.difficulty;
 }

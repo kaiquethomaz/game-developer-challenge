@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import type { MatchRecord, MatchSubmission } from '../api/contracts';
+import type { MatchConfigSnapshot, MatchRecord, MatchSubmission } from '../api/contracts';
 import { queryHistory, queryRanking, saveMatch } from './matchStore';
 
-const config = { matchDurationSeconds: 120, spawnIntervalSeconds: 3 };
+const config: MatchConfigSnapshot = {
+  matchDurationSeconds: 120,
+  spawnIntervalSeconds: 3,
+  difficulty: 'open',
+};
 
 function submission(overrides: Partial<MatchSubmission>): MatchSubmission {
   return {
@@ -50,14 +54,20 @@ describe('queryRanking', () => {
     submission({
       matchId: 'd',
       score: 50,
-      config: { matchDurationSeconds: 60, spawnIntervalSeconds: 3 },
+      config: { ...config, matchDurationSeconds: 60 },
     }),
+    'now',
+  );
+  saveMatch(
+    records,
+    submission({ matchId: 'e', score: 60, config: { ...config, difficulty: 'kraken' } }),
     'now',
   );
 
   it('only compares matches with the same configuration', () => {
     const page = queryRanking(records, config, 1, 10);
     expect(page.items.map((entry) => entry.matchId)).not.toContain('d');
+    expect(page.items.map((entry) => entry.matchId)).not.toContain('e');
     expect(page.totalItems).toBe(3);
   });
 

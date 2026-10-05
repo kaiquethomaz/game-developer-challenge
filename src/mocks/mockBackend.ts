@@ -1,4 +1,4 @@
-import type { MatchRecord } from '../api/contracts';
+import { parseDifficulty, type MatchRecord } from '../api/contracts';
 import { createRandom, type Random } from '../game/core/random';
 import { isRecord, readJson, removeKey, writeJson } from '../storage/localStore';
 import { createFixtureRecords } from './fixtures';
@@ -101,8 +101,16 @@ export const mockBackend = new MockBackend();
 
 function parseRecords(value: unknown): MatchRecord[] | null {
   if (!Array.isArray(value)) return null;
-  return value.filter(
-    (item): item is MatchRecord =>
-      isRecord(item) && typeof item.matchId === 'string' && typeof item.playerId === 'string',
-  );
+  return value
+    .filter(
+      (item): item is MatchRecord =>
+        isRecord(item) &&
+        typeof item.matchId === 'string' &&
+        typeof item.playerId === 'string' &&
+        isRecord(item.config),
+    )
+    .map((record) => ({
+      ...record,
+      config: { ...record.config, difficulty: parseDifficulty(record.config.difficulty) },
+    }));
 }

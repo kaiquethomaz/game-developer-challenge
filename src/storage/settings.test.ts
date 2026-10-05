@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { validateOptions } from './settings';
 
-const valid = { matchDurationSeconds: '120', spawnIntervalSeconds: '3', captainName: 'Anne' };
+const valid = {
+  matchDurationSeconds: '120',
+  spawnIntervalSeconds: '3',
+  difficulty: 'open',
+  captainName: 'Anne',
+} as const;
 
 describe('validateOptions', () => {
   it('accepts values within the documented limits', () => {
     expect(validateOptions(valid)).toEqual({
-      options: { matchDurationSeconds: 120, spawnIntervalSeconds: 3 },
+      options: { matchDurationSeconds: 120, spawnIntervalSeconds: 3, difficulty: 'open' },
       captainName: 'Anne',
     });
   });

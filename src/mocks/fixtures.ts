@@ -17,9 +17,11 @@ const CAPTAINS = [
 ] as const;
 
 const FIXTURE_CONFIGS: readonly MatchConfigSnapshot[] = [
-  { matchDurationSeconds: 120, spawnIntervalSeconds: 3 },
-  { matchDurationSeconds: 60, spawnIntervalSeconds: 3 },
-  { matchDurationSeconds: 180, spawnIntervalSeconds: 2 },
+  { matchDurationSeconds: 120, spawnIntervalSeconds: 3, difficulty: 'open' },
+  { matchDurationSeconds: 60, spawnIntervalSeconds: 3, difficulty: 'open' },
+  { matchDurationSeconds: 180, spawnIntervalSeconds: 2, difficulty: 'open' },
+  { matchDurationSeconds: 120, spawnIntervalSeconds: 3, difficulty: 'calm' },
+  { matchDurationSeconds: 120, spawnIntervalSeconds: 3, difficulty: 'kraken' },
 ];
 
 const FIXTURE_EPOCH = Date.UTC(2026, 8, 8, 18, 0, 0);

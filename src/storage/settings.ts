@@ -1,4 +1,10 @@
-import { DEFAULT_PLAYER_OPTIONS, OPTION_LIMITS, type PlayerOptions } from '../game/config';
+import {
+  DEFAULT_PLAYER_OPTIONS,
+  isDifficulty,
+  OPTION_LIMITS,
+  type Difficulty,
+  type PlayerOptions,
+} from '../game/config';
 import { isRecord, readJson, writeJson } from './localStore';
 
 const OPTIONS_KEY = 'pirate-battle:options';
@@ -18,6 +24,7 @@ export type OptionErrors = Partial<Record<OptionField, string>>;
 export interface OptionsDraft {
   readonly matchDurationSeconds: string;
   readonly spawnIntervalSeconds: string;
+  readonly difficulty: Difficulty;
   readonly captainName: string;
 }
 
@@ -69,6 +76,7 @@ export function validateOptions(
     options: {
       matchDurationSeconds: Number(draft.matchDurationSeconds),
       spawnIntervalSeconds: Number(draft.spawnIntervalSeconds),
+      difficulty: draft.difficulty,
     },
     captainName,
   };
@@ -104,7 +112,13 @@ function parseOptions(value: unknown): PlayerOptions | null {
   const duration = String(value.matchDurationSeconds);
   const interval = String(value.spawnIntervalSeconds);
   if (validateDuration(duration) || validateSpawnInterval(interval)) return null;
-  return { matchDurationSeconds: Number(duration), spawnIntervalSeconds: Number(interval) };
+  return {
+    matchDurationSeconds: Number(duration),
+    spawnIntervalSeconds: Number(interval),
+    difficulty: isDifficulty(value.difficulty)
+      ? value.difficulty
+      : DEFAULT_PLAYER_OPTIONS.difficulty,
+  };
 }
 
 function parseProfile(value: unknown): PlayerProfile | null {

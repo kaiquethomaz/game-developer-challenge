@@ -14,7 +14,8 @@ export type SaveResult =
 export function sameConfig(a: MatchConfigSnapshot, b: MatchConfigSnapshot): boolean {
   return (
     a.matchDurationSeconds === b.matchDurationSeconds &&
-    a.spawnIntervalSeconds === b.spawnIntervalSeconds
+    a.spawnIntervalSeconds === b.spawnIntervalSeconds &&
+    a.difficulty === b.difficulty
   );
 }
 

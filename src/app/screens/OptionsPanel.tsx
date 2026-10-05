@@ -35,6 +35,7 @@ export function OptionsPanel({
   const [draft, setDraft] = useState<OptionsDraft>({
     matchDurationSeconds: String(options.matchDurationSeconds),
     spawnIntervalSeconds: String(options.spawnIntervalSeconds),
+    difficulty: options.difficulty,
     captainName: profile.captainName,
   });
   const [errors, setErrors] = useState<OptionErrors>({});
