@@ -1,10 +1,59 @@
+<div align="center">
+
 # Pirate Battle
 
+**A top-down naval shooter built with React, TypeScript and PixiJS.**
+Sail between islands, sink chasers and shooters, salvage your hull and climb the captain's log before the timer runs out.
+
 [![CI](https://github.com/kaiquethomaz/game-developer-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/kaiquethomaz/game-developer-challenge/actions/workflows/ci.yml)
+![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![PixiJS](https://img.shields.io/badge/PixiJS-8-e72264)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-ff4154?logo=reactquery&logoColor=white)
+![MSW](https://img.shields.io/badge/MSW-2-ff6a33)
+![Playwright](https://img.shields.io/badge/Playwright-E2E_%2B_visual-2ead33?logo=playwright&logoColor=white)
 
-A top-down naval shooter built with React, TypeScript and PixiJS. Sail between islands, sink chasers and shooters, and climb the captain's log before the timer runs out.
+**[Play the live demo](#deployment)** · [Architecture](ARCHITECTURE.md) · [Performance report](docs/performance/PROFILE.md) · [Test reports](docs/reports/README.md)
 
-**Live demo:** _add the Vercel URL here after the first deploy_
+<img src="docs/images/battle.jpg" alt="A battle in progress: the player's ship trails foam between islands with pirate camps while chasers and shooters close in" width="900">
+
+</div>
+
+## Highlights
+
+- **Pure, deterministic simulation.** Fixed 1/60 s timestep, seeded randomness and no Pixi, React or DOM in the rules, so every battle can be replayed and unit tested.
+- **Smart enemies.** Chasers ram, shooters hold their range and aim with line of sight, and both steer around islands with a shared flow field.
+- **Living sea.** Drifting water, foam wakes, swaying hulls, shadows under cannonballs, damage stages, explosions and hand-placed pirate camps on every island, all from the provided art.
+- **More than the brief.** A triple volley on a long reload, repair salvage from sunk ships, enemy pressure that ramps over the match and three difficulties with separate rankings.
+- **Resilient captain's log.** Idempotent match registration, a persisted pending queue, cancelled stale requests and 14 reproducible network scenarios served by MSW, also in production.
+- **Accessible on every screen.** Keyboard and multi-touch controls, managed focus in dialogs, a polite live region for the battle and reduced motion support.
+- **Tested and measured.** 80 unit tests, 110 Playwright tests on desktop and mobile with per platform visual baselines, CI on every push and a 60 FPS profile with memory checks.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/prepare.jpg" alt="Prepare for battle screen with duration, spawn interval and difficulty"><p align="center"><b>Prepare for battle</b>: duration, spawn interval, difficulty and captain name</p></td>
+    <td width="50%"><img src="docs/images/ranking.jpg" alt="Captain's log ranking table with pagination"><p align="center"><b>Captain's log</b>: ranking per configuration and match history</p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/result.jpg" alt="Battle complete screen with score, time, end reason and registration status"><p align="center"><b>Result</b>: score, time played, end reason and registration status</p></td>
+    <td width="50%"><img src="docs/images/mobile.jpg" alt="Mobile landscape battle with touch controls"><p align="center"><b>Mobile</b>: landscape layout with multi-touch controls</p></td>
+  </tr>
+</table>
+
+## Contents
+
+- [Tech stack](#tech-stack)
+- [Setup](#setup)
+- [Commands](#commands)
+- [Controls](#controls)
+- [Gameplay configuration](#gameplay-configuration)
+- [Network scenarios](#network-scenarios)
+- [Testing](#testing)
+- [Performance](#performance)
+- [Deployment](#deployment)
+- [Assets and licenses](#assets-and-licenses)
+
+## Tech stack
 
 | Concern                             | Technology                                                                    |
 | ----------------------------------- | ----------------------------------------------------------------------------- |
@@ -155,6 +204,8 @@ Font rendering differs between operating systems, so visual baselines are versio
 `npm run profile` builds the app, plays a 3 minute match with a scripted captain and runs five start, play and exit cycles. The latest results, with hardware, browser, resolution, configuration and limitations, are in [docs/performance/PROFILE.md](docs/performance/PROFILE.md).
 
 ## Deployment
+
+**Live demo:** _add the Vercel URL here after the first deploy_
 
 The app is a static Vite build. On Vercel, import the repository with the default Vite preset (build `npm run build`, output `dist`). `vercel.json` keeps the mock service worker uncached so new deployments pick up handler changes. The mock API runs in the deployed build, so the game works when opening or reloading the public URL.
 
