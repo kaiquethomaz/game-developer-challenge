@@ -6,12 +6,14 @@ import type { Simulation } from '../core/simulation';
 import { createArenaView } from './ArenaView';
 import { EffectsLayer } from './EffectsLayer';
 import { HealthBarFills } from './HealthBar';
+import { SalvageLayer } from './SalvageLayer';
 import { ShipView } from './ShipView';
 import type { GameTextures } from './textures';
 
 const BACKGROUND_COLOR = 0x1b2a3a;
 const MAX_PIXEL_RATIO = 2;
 const SHAKE_DECAY_PER_SECOND = 4;
+const REPAIR_COLOR = 0x7dff9b;
 
 export interface RendererOptions {
   readonly seed: number;
@@ -37,6 +39,8 @@ export class GameRenderer {
   private readonly enemyFills: HealthBarFills;
   private ringTexture: Texture | null = null;
   private puffTexture: Texture | null = null;
+  private discTexture: Texture | null = null;
+  private salvageLayer: SalvageLayer | null = null;
   private shake = 0;
   private destroyed = false;
 
@@ -96,6 +100,7 @@ export class GameRenderer {
     for (const event of events) this.handleEvent(event);
     this.syncShips(dt);
     this.syncProjectiles();
+    this.salvageLayer?.sync(this.simulation.salvage.items, dt);
     this.effects.update(dt);
     this.updateShake(dt);
   }
@@ -110,6 +115,7 @@ export class GameRenderer {
     this.enemyFills.destroy();
     this.ringTexture?.destroy(true);
     this.puffTexture?.destroy(true);
+    this.discTexture?.destroy(true);
     this.app.destroy(
       { removeView: true },
       { children: true, texture: false, textureSource: false },
@@ -118,21 +124,31 @@ export class GameRenderer {
 
   private build(): void {
     const { arena } = this.simulation;
-    this.world.addChild(
-      createArenaView(arena, this.simulation.config.arena.islands, this.textures),
-      this.shipLayer,
-      this.projectileLayer,
-      this.effects,
-      this.overlayLayer,
-    );
-    this.app.stage.addChild(this.world);
-
     this.ringTexture = this.app.renderer.generateTexture(
       new Graphics().circle(0, 0, 24).stroke({ width: 4, color: 0xffffff }),
     );
     this.puffTexture = this.app.renderer.generateTexture(
       new Graphics().circle(0, 0, 14).fill({ color: 0xe8e2d6 }),
     );
+    const [plank, crossPlank] = this.textures.debris;
+    if (!plank || !crossPlank) throw new Error('Salvage textures are missing');
+    this.discTexture = this.app.renderer.generateTexture(
+      new Graphics().circle(0, 0, 26).fill({ color: 0xffffff }),
+    );
+    this.salvageLayer = new SalvageLayer(
+      { planks: [plank, crossPlank], ring: this.ringTexture, disc: this.discTexture },
+      !this.options.reducedMotion,
+    );
+
+    this.world.addChild(
+      createArenaView(arena, this.simulation.config.arena.islands, this.textures),
+      this.salvageLayer,
+      this.shipLayer,
+      this.projectileLayer,
+      this.effects,
+      this.overlayLayer,
+    );
+    this.app.stage.addChild(this.world);
 
     this.app.renderer.on('resize', this.layout);
     this.layout();
@@ -227,6 +243,12 @@ export class GameRenderer {
       case 'islandBump':
         this.addShake(4);
         break;
+      case 'salvageDropped':
+        this.spawnSplash(event.x, event.y);
+        break;
+      case 'repaired':
+        this.spawnRepair(event.x, event.y);
+        break;
       case 'spawned':
       case 'scored':
       case 'ended':
@@ -272,6 +294,20 @@ export class GameRenderer {
       scaleFrom: 0.2,
       scaleTo: 0.9,
       alphaFrom: 0.8,
+    });
+  }
+
+  private spawnRepair(x: number, y: number): void {
+    if (!this.ringTexture) return;
+    this.effects.spawn({
+      frames: [this.ringTexture],
+      x,
+      y,
+      duration: 0.5,
+      scaleFrom: 0.6,
+      scaleTo: 2.2,
+      alphaFrom: 0.9,
+      tint: REPAIR_COLOR,
     });
   }
 
