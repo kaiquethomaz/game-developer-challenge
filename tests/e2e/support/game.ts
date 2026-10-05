@@ -51,14 +51,11 @@ export async function readState(page: Page): Promise<GameStateProbe> {
 }
 
 export async function advance(page: Page, seconds: number): Promise<void> {
-  await page.evaluate(
-    ({ total, step }) => {
-      const probe = window.__pirateBattle;
-      if (!probe) throw new Error('Battle probe is not available');
-      for (let elapsed = 0; elapsed < total - 1e-9; elapsed += step) probe.advance(step);
-    },
-    { total: seconds, step: STEP_SECONDS },
-  );
+  await page.evaluate((total) => {
+    const probe = window.__pirateBattle;
+    if (!probe) throw new Error('Battle probe is not available');
+    probe.advance(total);
+  }, seconds);
 }
 
 export async function holdKeys(

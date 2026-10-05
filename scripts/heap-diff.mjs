@@ -49,7 +49,7 @@ try {
     await page.keyboard.down('Space');
     await page.keyboard.down('KeyD');
     await page.evaluate(() => {
-      for (let i = 0; i < 600; i += 1) window.__pirateBattle?.advance(1 / 60);
+      window.__pirateBattle?.advance(10);
     });
     await page.keyboard.up('Space');
     await page.keyboard.up('KeyD');

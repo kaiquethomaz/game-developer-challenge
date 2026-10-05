@@ -100,7 +100,7 @@ test.describe('match registration', () => {
     await page.getByRole('button', { name: 'Play', exact: true }).click();
     await page.waitForFunction(() => window.__pirateBattle !== undefined);
     await page.evaluate(() => {
-      for (let i = 0; i < 121 * 60; i += 1) window.__pirateBattle?.advance(1 / 60);
+      window.__pirateBattle?.advance(121);
     });
     await expect(page.getByTestId('registration-status')).toContainText('Assisted test battle');
     const rows = await historyRows(page);

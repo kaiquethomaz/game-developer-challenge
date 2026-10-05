@@ -117,8 +117,10 @@ export class GameSession {
 
   advance(seconds: number): void {
     if (this.options.clock !== 'manual' || this.pauseReason || this.ended) return;
-    this.accumulator.advance(seconds, this.stepOnce);
-    this.flushFrame(seconds);
+    const { fixedStepSeconds } = this.options.config;
+    const steps = Math.round(seconds / fixedStepSeconds);
+    for (let i = 0; i < steps; i += 1) this.stepOnce(fixedStepSeconds);
+    this.flushFrame(steps * fixedStepSeconds);
   }
 
   destroy(): void {
