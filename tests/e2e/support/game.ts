@@ -45,6 +45,7 @@ export async function startBattle(page: Page, setup: BattleSetup = {}): Promise<
   }
   await page.goto(battleUrl(setup));
   await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByRole('button', { name: 'Set sail' }).click();
   await page.waitForFunction(() => window.__pirateBattle !== undefined);
 }
 

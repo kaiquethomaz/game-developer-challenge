@@ -38,6 +38,7 @@ test.describe('navigation', () => {
       await page.getByRole('button', { name: 'Ranking' }).click();
       await page.getByRole('button', { name: 'Main menu' }).click();
       await page.getByRole('button', { name: 'Play', exact: true }).click();
+      await page.getByRole('button', { name: 'Set sail' }).click();
       await page.waitForFunction(() => window.__pirateBattle?.getState().elapsedSeconds === 0);
     }
     const state = await readState(page);

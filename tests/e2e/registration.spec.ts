@@ -55,6 +55,8 @@ test.describe('match registration', () => {
     await expect(page.getByText('1 battle is waiting to be recorded.')).toBeVisible();
 
     await page.getByRole('button', { name: 'Play', exact: true }).click();
+
+    await page.getByRole('button', { name: 'Set sail' }).click();
     await page.waitForFunction(() => window.__pirateBattle !== undefined);
     await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Main menu' }).click();
@@ -98,6 +100,7 @@ test.describe('match registration', () => {
   test('assisted test battles are never sent to the captain’s log', async ({ page }) => {
     await page.goto('/?e2e=1&clock=manual&seed=4&latency=0&invulnerable=1');
     await page.getByRole('button', { name: 'Play', exact: true }).click();
+    await page.getByRole('button', { name: 'Set sail' }).click();
     await page.waitForFunction(() => window.__pirateBattle !== undefined);
     await page.evaluate(() => {
       window.__pirateBattle?.advance(121);

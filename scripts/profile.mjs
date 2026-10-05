@@ -135,6 +135,7 @@ async function profileMatch(browser) {
   await page.goto(`${BASE_URL}/?e2e=1&seed=7&invulnerable=1&latency=0`);
   const renderer = await gpuRenderer(page);
   await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByRole('button', { name: 'Set sail' }).click();
   await page.waitForFunction(() => window.__pirateBattle !== undefined);
   await page.evaluate(RECORDER_SOURCE);
   await page.evaluate(BOT_SOURCE);
@@ -206,6 +207,7 @@ async function profileMemory(browser) {
   const snapshots = [await measure('menu (baseline)')];
   for (let cycle = 1; cycle <= MEMORY_CYCLES; cycle += 1) {
     await page.getByRole('button', { name: 'Play', exact: true }).click();
+    await page.getByRole('button', { name: 'Set sail' }).click();
     await page.waitForFunction(() => window.__pirateBattle !== undefined);
     await page.evaluate(BOT_SOURCE);
     await page.waitForTimeout(MEMORY_CYCLE_SECONDS * 1000);

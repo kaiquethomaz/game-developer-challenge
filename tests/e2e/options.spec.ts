@@ -53,6 +53,28 @@ test.describe('options', () => {
     await expect(increase).toBeDisabled();
   });
 
+  test('play opens the battle setup and sets sail with the chosen settings', async ({ page }) => {
+    await page.goto('/?e2e=1&clock=manual&latency=0');
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Prepare for battle' })).toBeVisible();
+    const setSail = page.getByRole('button', { name: 'Set sail' });
+    await expect(setSail).toBeFocused();
+
+    await page.getByLabel('Game session time', { exact: true }).fill('75');
+    await page.getByRole('radio', { name: /Calm Waters/ }).check();
+    await setSail.click();
+    await page.waitForFunction(() => window.__pirateBattle !== undefined);
+    const config = await page.evaluate(() => window.__pirateBattle?.getState().config);
+    expect(config?.matchDurationSeconds).toBe(75);
+    expect(config?.maxAlive).toEqual({ start: 3, end: 6 });
+
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Main menu' }).click();
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
+    await expect(page.getByLabel('Game session time', { exact: true })).toHaveValue('75');
+    await expect(page.getByRole('radio', { name: /Calm Waters/ })).toBeChecked();
+  });
+
   test('menus are keyboard navigable with visible focus', async ({ page }) => {
     await page.goto('/?latency=0');
     const play = page.getByRole('button', { name: 'Play', exact: true });

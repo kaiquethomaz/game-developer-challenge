@@ -45,6 +45,7 @@ try {
 
   const playCycle = async () => {
     await page.getByRole('button', { name: 'Play', exact: true }).click();
+    await page.getByRole('button', { name: 'Set sail' }).click();
     await page.waitForFunction(() => window.__pirateBattle !== undefined);
     await page.keyboard.down('Space');
     await page.keyboard.down('KeyD');

@@ -97,6 +97,7 @@ test.describe("captain's log", () => {
     });
     await page.getByRole('button', { name: 'Main menu' }).click();
     await page.getByRole('button', { name: 'Play', exact: true }).click();
+    await page.getByRole('button', { name: 'Set sail' }).click();
     await expect(page.getByTestId('hud-time')).toBeVisible();
   });
 
