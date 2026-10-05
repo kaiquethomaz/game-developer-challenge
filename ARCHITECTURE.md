@@ -157,6 +157,7 @@ The difficulty travels with the match configuration snapshot (`MatchConfigSnapsh
 
 | Decision                                                                 | Reason                                                                                                                                 |
 | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Ship speeds: player 150, chaser 120, shooter 90 px/s                     | The player crosses the arena in about 13 s and can always outrun a chaser, which keeps the battle readable on small screens.           |
 | Front cannon: 25 damage, 0.45 s cooldown, 560 px range                   | Precise and quick, rewards aiming.                                                                                                     |
 | Broadsides: three 20 damage balls, 1.2 s cooldown, 380 px range          | Strong at close range but slow, so they reward positioning alongside enemies.                                                          |
 | Triple volley: three 25 damage balls fanned 0.24 rad apart, 6 s cooldown | A burst for emergencies that rewards aiming at groups; the long reload keeps the front cannon the main weapon.                         |

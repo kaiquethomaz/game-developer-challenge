@@ -78,6 +78,8 @@ Keys can be held together, so you can sail, turn and fire at the same time. Touc
 
 All balancing lives in a single typed object, `DEFAULT_GAME_CONFIG` in [`src/game/config.ts`](src/game/config.ts): arena and islands, spawn timing and distribution, health, movement and turn speeds, weapon damage, cooldowns, projectile speed, range and lifetime, and the shooter's attack and preferred range. It also holds the enemy pressure ramp (the cap of enemies alive grows from 4 to 10 and shooters become more common as the match goes on) and the repair salvage drops. Systems never hard-code gameplay numbers.
 
+**Play** opens a **Prepare for battle** screen with the same form as Options, so the duration, spawn interval, difficulty and captain name can be checked right before sailing; **Set sail** validates, saves and starts the battle. **Play again** on the result screen restarts at once with the saved settings.
+
 The Options screen exposes two values, validated and persisted in `localStorage`:
 
 | Option            | Range    | Step  | Default |
