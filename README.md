@@ -1,0 +1,138 @@
+# Pirate Battle
+
+A top-down naval shooter built with React, TypeScript and PixiJS. Sail between islands, sink chasers and shooters, and climb the captain's log before the timer runs out.
+
+**Live demo:** _add the Vercel URL here after the first deploy_
+
+| Concern                             | Technology                                                                    |
+| ----------------------------------- | ----------------------------------------------------------------------------- |
+| Menus, forms, HUD, dialogs          | React 19                                                                      |
+| Language                            | TypeScript (strict, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`) |
+| Arena, ships, projectiles, effects  | PixiJS 8                                                                      |
+| Ranking and match history state     | TanStack Query 5                                                              |
+| HTTP client                         | Axios                                                                         |
+| Mock REST API (dev, tests and prod) | MSW 2                                                                         |
+| End-to-end and visual tests         | Playwright                                                                    |
+| Unit tests for the simulation       | Vitest                                                                        |
+| Build                               | Vite 8                                                                        |
+
+Architecture and design decisions are documented in [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Setup
+
+Requirements: Node.js 22.12 or newer (developed with Node 24) and npm.
+
+```bash
+npm ci
+npx playwright install chromium
+npm run dev
+```
+
+The dev server runs on <http://localhost:5173>. No backend or private service is needed: the ranking and history API is served by MSW inside the browser, also in the production build.
+
+### Environment variables
+
+None. The app is fully static. Everything that varies at runtime is controlled through the URL parameters described below.
+
+## Commands
+
+| Command                   | Description                                                        |
+| ------------------------- | ------------------------------------------------------------------ |
+| `npm run dev`             | Vite dev server with React Strict Mode                             |
+| `npm run build`           | Type check and production build into `dist/`                       |
+| `npm run preview`         | Serve the production build on <http://localhost:4173>              |
+| `npm run lint`            | ESLint with type-aware rules                                       |
+| `npm run typecheck`       | TypeScript project references, no emit                             |
+| `npm run format`          | Prettier                                                           |
+| `npm test`                | Vitest unit tests for the simulation, storage, API and mocks       |
+| `npm run test:e2e`        | Playwright suite on desktop and mobile Chromium (builds first)     |
+| `npm run test:e2e:ui`     | Playwright UI mode                                                 |
+| `npm run test:e2e:update` | Regenerate the visual regression baselines                         |
+| `npm run test:e2e:report` | Open the last HTML report (traces are kept for failed tests)       |
+| `npm run profile`         | Production build plus a 3 minute profiling match and memory cycles |
+| `npm run profile:heap`    | Heap snapshot comparison by V8 node type across battle cycles      |
+| `npm run atlas`           | Regenerate the Pixi atlases from the provided sprite sheets        |
+
+## Controls
+
+| Action                 | Keyboard           | Touch (landscape)         |
+| ---------------------- | ------------------ | ------------------------- |
+| Sail forward           | `W` or `↑`         | Forward button, left side |
+| Turn left / right      | `A` `D` or `←` `→` | Turn buttons, left side   |
+| Front cannon           | `Space` or `J`     | Center button, right side |
+| Left / right broadside | `Q` / `E`          | Side buttons, right side  |
+| Pause                  | `Esc` or `P`       | Pause button in the HUD   |
+
+Keys can be held together, so you can sail, turn and fire at the same time. Touch buttons are multi-touch. Game keys are only captured while a battle is running; they are released in menus, dialogs and form fields. On phones the game is played in landscape; portrait shows a rotate hint.
+
+## Gameplay configuration
+
+All balancing lives in a single typed object, `DEFAULT_GAME_CONFIG` in [`src/game/config.ts`](src/game/config.ts): arena and islands, spawn timing and distribution, health, movement and turn speeds, weapon damage, cooldowns, projectile speed, range and lifetime, and the shooter's attack and preferred range. Systems never hard-code gameplay numbers.
+
+The Options screen exposes two values, validated and persisted in `localStorage`:
+
+| Option            | Range    | Step  | Default |
+| ----------------- | -------- | ----- | ------- |
+| Game session time | 60–180 s | 1 s   | 120 s   |
+| Enemy spawn time  | 1–10 s   | 0.5 s | 3 s     |
+
+Each match takes a snapshot of the options when it starts (`createMatchConfig`), so changing them mid-battle only affects the next one. The Options screen also stores the captain name shown in the ranking and a sound toggle.
+
+## Network scenarios
+
+The mock API supports reproducible scenarios. Pick one from the gear button on the main menu (**Network scenarios**) or with URL parameters, which are persisted until reset:
+
+| Parameter  | Values                                                                                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `scenario` | `success`, `empty`, `many-pages`, `slow`, `variable-latency`, `out-of-order`, `timeout`, `network-error`, `server-error`, `client-error`, `ranking-error`, `history-error`, `record-timeout`, `record-unavailable` |
+| `latency`  | Base latency in milliseconds for normal scenarios (default `250`)                                                                                                                                                  |
+| `mockSeed` | Seed for the variable latency scenario                                                                                                                                                                             |
+
+**Reset:** use **Reset mock data** in the Network scenarios dialog. It clears every match recorded by the mock server and restores the `success` scenario. Pending local submissions are kept on purpose so recovery can be exercised.
+
+### Reproducing failures
+
+| Goal                                         | How                                                                                   |
+| -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Loading and background updates               | `/?scenario=slow`, open Ranking                                                       |
+| Empty lists                                  | `/?scenario=empty`                                                                    |
+| Pagination                                   | `/?scenario=many-pages`                                                               |
+| Late answers that must not overwrite data    | `/?scenario=out-of-order`, page back and forth in Ranking                             |
+| Ranking or history failures                  | `/?scenario=ranking-error` or `/?scenario=history-error`                              |
+| Timeout, connection failure, 4xx and 5xx     | `/?scenario=timeout`, `network-error`, `client-error`, `server-error`                 |
+| Timeout after the server stored a match      | `/?scenario=record-timeout`, finish a battle: the retry recovers the stored record    |
+| API down when the battle ends, then recovery | `/?scenario=record-unavailable`, finish a battle, refresh, switch to `success`, retry |
+| Asset loading failure                        | Block `assets/atlas/ships.json` in the browser dev tools, then press **Try again**    |
+
+## Testing
+
+```bash
+npm test
+npm run test:e2e
+```
+
+The Playwright suite runs against the production build (`vite preview`) on two projects: **desktop Chromium** (1280×720) and **mobile Chromium** (Pixel 7 landscape). It covers the twelve areas listed in the challenge, including visual regression baselines for the menu, a stable arena and the result screen in `tests/e2e/__screenshots__/`. The HTML report is written to `playwright-report/`, and traces and videos are kept for failed tests in `test-results/`.
+
+Determinism comes from an opt-in probe enabled with `?e2e=1`:
+
+| Parameter        | Effect                                                                        |
+| ---------------- | ----------------------------------------------------------------------------- |
+| `seed=<n>`       | Seeds enemy spawns and placement                                              |
+| `clock=manual`   | The simulation only advances through `window.__pirateBattle.advance(seconds)` |
+| `invulnerable=1` | Profiling only: the player takes no damage, every other rule is unchanged     |
+
+The probe also exposes read-only state through `window.__pirateBattle.getState()`. Combat tests still press the real keyboard and touch controls, and every test starts from a fresh browser context.
+
+Visual baselines were generated on Windows. Font rendering differs between operating systems, so regenerate them with `npm run test:e2e:update` when running the suite on another platform.
+
+## Performance
+
+`npm run profile` builds the app, plays a 3 minute match with a scripted captain and runs five start, play and exit cycles. The latest results, with hardware, browser, resolution, configuration and limitations, are in [docs/performance/PROFILE.md](docs/performance/PROFILE.md).
+
+## Deployment
+
+The app is a static Vite build. On Vercel, import the repository with the default Vite preset (build `npm run build`, output `dist`). `vercel.json` keeps the mock service worker uncached so new deployments pick up handler changes. The mock API runs in the deployed build, so the game works when opening or reloading the public URL.
+
+## Assets and licenses
+
+The art and sound pack provided with the challenge lives in `public/assets/`. Sources and licenses are listed in [docs/ASSETS.md](docs/ASSETS.md).
