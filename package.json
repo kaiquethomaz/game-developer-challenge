@@ -20,7 +20,10 @@
     "test:e2e:report": "playwright show-report",
     "test": "vitest run",
     "test:watch": "vitest",
-    "atlas": "node scripts/build-atlases.mjs"
+    "atlas": "node scripts/build-atlases.mjs",
+    "profile": "npm run build && node scripts/profile.mjs",
+    "profile:headed": "npm run build && node scripts/profile.mjs --headed",
+    "profile:heap": "npm run build && node scripts/heap-diff.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.1",
