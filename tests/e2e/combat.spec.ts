@@ -64,6 +64,30 @@ test.describe('combat', () => {
     expect(playerProjectiles(state).filter((p) => p.y < state.player.y - 20)).toHaveLength(3);
   });
 
+  test('the triple volley fans three balls forward and reloads before firing again', async ({
+    page,
+  }) => {
+    const gauge = page.getByTestId('hud-volley');
+    await expect(gauge).toHaveAccessibleName('Triple volley ready');
+    const { player } = await readState(page);
+
+    await page.keyboard.down('KeyR');
+    await advance(page, 0.2);
+    const fired = await readState(page);
+    const volley = playerProjectiles(fired);
+    expect(volley).toHaveLength(3);
+    expect(volley.every((projectile) => projectile.x > player.x)).toBe(true);
+    expect(new Set(volley.map((projectile) => Math.round(projectile.y))).size).toBe(3);
+    expect(fired.player.cooldowns.volley).toBeGreaterThan(5);
+    await expect(gauge).toHaveAccessibleName('Triple volley reloading');
+
+    await advance(page, 3);
+    expect(playerProjectiles(await readState(page))).toHaveLength(0);
+    await advance(page, 3);
+    await page.keyboard.up('KeyR');
+    expect(playerProjectiles(await readState(page))).toHaveLength(3);
+  });
+
   test('projectiles disappear after their range', async ({ page }) => {
     await tap(page, 'Space');
     await advance(page, 1.3);

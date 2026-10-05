@@ -199,6 +199,7 @@ export class GameSession {
       remainingSeconds: Math.ceil(this.simulation.remainingSeconds - 1e-6),
       health: Math.ceil(state.player.health),
       maxHealth: state.player.maxHealth,
+      volleyReady: state.player.cooldowns.volley <= 0,
       endReason: state.endReason,
     };
   }

@@ -215,6 +215,7 @@ function BattleOverlay({
     <>
       <Hud
         hud={hud}
+        volleyCooldownSeconds={session.simulation.config.player.volley.cooldownSeconds}
         onPause={() => {
           session.pause('manual');
         }}
@@ -288,7 +289,15 @@ function pauseMessage(reason: HudSnapshot['pauseReason']): string {
   }
 }
 
-function Hud({ hud, onPause }: { hud: HudSnapshot; onPause: () => void }) {
+function Hud({
+  hud,
+  volleyCooldownSeconds,
+  onPause,
+}: {
+  hud: HudSnapshot;
+  volleyCooldownSeconds: number;
+  onPause: () => void;
+}) {
   const ratio = hud.maxHealth > 0 ? hud.health / hud.maxHealth : 0;
   const fill = ratio > 0.5 ? 'green' : ratio > 0.25 ? 'amber' : 'red';
   return (
@@ -326,6 +335,11 @@ function Hud({ hud, onPause }: { hud: HudSnapshot; onPause: () => void }) {
             {formatClock(hud.remainingSeconds)}
           </span>
         </div>
+        <VolleyGauge
+          ready={hud.volleyReady}
+          paused={hud.status !== 'running'}
+          cooldownSeconds={volleyCooldownSeconds}
+        />
         <RoundButton
           icon="pause"
           label="Pause"
@@ -335,6 +349,46 @@ function Hud({ hud, onPause }: { hud: HudSnapshot; onPause: () => void }) {
         />
       </div>
     </header>
+  );
+}
+
+function VolleyGauge({
+  ready,
+  paused,
+  cooldownSeconds,
+}: {
+  ready: boolean;
+  paused: boolean;
+  cooldownSeconds: number;
+}) {
+  const [charges, setCharges] = useState(0);
+  const [wasReady, setWasReady] = useState(ready);
+  if (ready !== wasReady) {
+    setWasReady(ready);
+    if (!ready) setCharges((count) => count + 1);
+  }
+
+  return (
+    <div
+      className="hud__counter hud__volley"
+      data-ready={ready}
+      data-testid="hud-volley"
+      aria-label={ready ? 'Triple volley ready' : 'Triple volley reloading'}
+    >
+      <img src="/assets/png/retina/ui/controls/icon_fire_front.png" alt="" />
+      <span aria-hidden="true">×3</span>
+      {!ready && (
+        <span
+          key={charges}
+          className="hud__volley-charge"
+          aria-hidden="true"
+          style={{
+            animationDuration: `${cooldownSeconds}s`,
+            animationPlayState: paused ? 'paused' : 'running',
+          }}
+        />
+      )}
+    </div>
   );
 }
 
@@ -398,6 +452,12 @@ const TOUCH_RIGHT: readonly {
   { action: 'fireRight', icon: 'fire_right', label: 'Fire right broadside' },
 ];
 
+const TOUCH_VOLLEY = {
+  action: 'fireVolley',
+  icon: 'fire_front',
+  label: 'Fire triple volley',
+} as const satisfies { action: GameAction; icon: 'fire_front'; label: string };
+
 function TouchControls({ input }: { input: InputController }) {
   return (
     <div className="touch-controls" aria-label="Touch controls">
@@ -406,10 +466,15 @@ function TouchControls({ input }: { input: InputController }) {
           <TouchButton key={item.action} input={input} {...item} />
         ))}
       </div>
-      <div className="touch-controls__cluster touch-controls__cluster--fire">
-        {TOUCH_RIGHT.map((item) => (
-          <TouchButton key={item.action} input={input} {...item} />
-        ))}
+      <div className="touch-controls__fire">
+        <div className="touch-controls__volley">
+          <TouchButton input={input} {...TOUCH_VOLLEY} />
+        </div>
+        <div className="touch-controls__cluster touch-controls__cluster--fire">
+          {TOUCH_RIGHT.map((item) => (
+            <TouchButton key={item.action} input={input} {...item} />
+          ))}
+        </div>
       </div>
     </div>
   );

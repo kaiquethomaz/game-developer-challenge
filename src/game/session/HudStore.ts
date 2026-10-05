@@ -10,6 +10,7 @@ export interface HudSnapshot {
   readonly remainingSeconds: number;
   readonly health: number;
   readonly maxHealth: number;
+  readonly volleyReady: boolean;
   readonly endReason: EndReason | null;
 }
 
@@ -49,6 +50,7 @@ function shallowEqual(a: HudSnapshot, b: HudSnapshot): boolean {
     a.remainingSeconds === b.remainingSeconds &&
     a.health === b.health &&
     a.maxHealth === b.maxHealth &&
+    a.volleyReady === b.volleyReady &&
     a.endReason === b.endReason
   );
 }
