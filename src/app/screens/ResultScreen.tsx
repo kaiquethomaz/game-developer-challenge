@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMatchSync, useRegistrationStatus } from '../../api/queries';
 import type { MatchOutcome } from '../../game/session/GameSession';
 import { Button } from '../../ui/Button';
-import { endReasonLabel, formatClock, formatDuration } from '../format';
+import { difficultyLabel, endReasonLabel, formatClock, formatDuration } from '../format';
 
 interface ResultScreenProps {
   readonly outcome: MatchOutcome;
@@ -29,7 +29,7 @@ export function ResultScreen({ outcome, onPlayAgain, onMainMenu }: ResultScreenP
         <span aria-label={formatDuration(outcome.durationSeconds)}>
           {formatClock(outcome.durationSeconds)}
         </span>{' '}
-        · {endReasonLabel(outcome.endReason)}
+        · {endReasonLabel(outcome.endReason)} · {difficultyLabel(outcome.options.difficulty)}
       </p>
 
       <div

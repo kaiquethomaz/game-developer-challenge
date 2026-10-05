@@ -1,4 +1,5 @@
 import type { MatchEndReason } from '../api/contracts';
+import { DIFFICULTY_PRESETS, type Difficulty } from '../game/config';
 
 export function formatClock(totalSeconds: number): string {
   const safe = Math.max(0, Math.round(totalSeconds));
@@ -24,6 +25,10 @@ export function formatPlayedAt(iso: string): { date: string; time: string } {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return { date: `${day} ${MONTHS[date.getMonth()] ?? ''}`, time: `${hours}:${minutes}` };
+}
+
+export function difficultyLabel(difficulty: Difficulty): string {
+  return DIFFICULTY_PRESETS[difficulty].label;
 }
 
 export function endReasonLabel(reason: MatchEndReason): string {

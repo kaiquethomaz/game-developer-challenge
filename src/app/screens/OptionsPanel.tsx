@@ -1,5 +1,11 @@
 import { useId, useState } from 'react';
-import { OPTION_LIMITS, type PlayerOptions } from '../../game/config';
+import {
+  DIFFICULTIES,
+  DIFFICULTY_PRESETS,
+  OPTION_LIMITS,
+  type Difficulty,
+  type PlayerOptions,
+} from '../../game/config';
 import {
   CAPTAIN_NAME_LIMITS,
   validateOptions,
@@ -41,7 +47,7 @@ export function OptionsPanel({
   const [errors, setErrors] = useState<OptionErrors>({});
   const [status, setStatus] = useState<string>('');
 
-  const update = (field: keyof OptionsDraft, value: string) => {
+  const update = (field: Exclude<keyof OptionsDraft, 'difficulty'>, value: string) => {
     setDraft((current) => ({ ...current, [field]: value }));
     setStatus('');
   };
@@ -99,6 +105,13 @@ export function OptionsPanel({
             update('spawnIntervalSeconds', value);
           }}
         />
+        <DifficultyPicker
+          value={draft.difficulty}
+          onChange={(difficulty) => {
+            setDraft((current) => ({ ...current, difficulty }));
+            setStatus('');
+          }}
+        />
         <TextField
           label="Captain name"
           value={draft.captainName}
@@ -129,6 +142,46 @@ export function OptionsPanel({
         </div>
       </form>
     </section>
+  );
+}
+
+function DifficultyPicker({
+  value,
+  onChange,
+}: {
+  value: Difficulty;
+  onChange: (difficulty: Difficulty) => void;
+}) {
+  const name = useId();
+  return (
+    <fieldset className="field difficulty">
+      <legend className="field__label">Difficulty</legend>
+      <div className="difficulty__options">
+        {DIFFICULTIES.map((difficulty) => {
+          const preset = DIFFICULTY_PRESETS[difficulty];
+          const descriptionId = `${name}-${difficulty}`;
+          return (
+            <label key={difficulty} className="difficulty__option" data-difficulty={difficulty}>
+              <input
+                type="radio"
+                name={name}
+                value={difficulty}
+                checked={value === difficulty}
+                aria-describedby={descriptionId}
+                onChange={() => {
+                  onChange(difficulty);
+                }}
+              />
+              <span className="difficulty__name">{preset.label}</span>
+              <span className="difficulty__description" id={descriptionId}>
+                {preset.description}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+      <p className="field__hint">Each difficulty has its own ranking.</p>
+    </fieldset>
   );
 }
 

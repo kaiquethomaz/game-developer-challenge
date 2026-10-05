@@ -4,7 +4,7 @@ import { DEFAULT_PAGE_SIZE, type MatchConfigSnapshot, type Page } from '../../ap
 import { useHistory, usePendingMatches, useRanking, useMatchSync } from '../../api/queries';
 import type { PlayerProfile } from '../../storage/settings';
 import { Button, RoundButton } from '../../ui/Button';
-import { endReasonLabel, formatClock, formatPlayedAt } from '../format';
+import { difficultyLabel, endReasonLabel, formatClock, formatPlayedAt } from '../format';
 
 export type LogTab = 'ranking' | 'history';
 
@@ -120,8 +120,8 @@ function RankingTab({
   return (
     <>
       <p className="panel__subtitle">
-        {config.matchDurationSeconds} second battles · {config.spawnIntervalSeconds} second spawn
-        interval
+        {difficultyLabel(config.difficulty)} · {config.matchDurationSeconds} second battles ·{' '}
+        {config.spawnIntervalSeconds} second spawn interval
       </p>
       <QueryState
         query={query}
@@ -246,6 +246,7 @@ function HistoryTab({
                   <th scope="col">Date</th>
                   <th scope="col">Points</th>
                   <th scope="col">Duration</th>
+                  <th scope="col">Mode</th>
                   <th scope="col">Result</th>
                 </tr>
               </thead>
@@ -262,6 +263,7 @@ function HistoryTab({
                       </td>
                       <td className="log-table__points">{record.score}</td>
                       <td>{formatClock(record.durationSeconds)}</td>
+                      <td>{difficultyLabel(record.config.difficulty)}</td>
                       <td className={`log-table__result log-table__result--${record.endReason}`}>
                         {endReasonLabel(record.endReason)}
                       </td>
