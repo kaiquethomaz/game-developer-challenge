@@ -1,6 +1,7 @@
 import { Container, Graphics, Sprite, TilingSprite } from 'pixi.js';
 import type { TileRect } from '../config';
 import type { Arena } from '../core/arena';
+import { LARGE_ISLAND_SCENES, SMALL_ISLAND_SCENE, type ScenePiece } from './islandScenes';
 import type { GameTextures } from './textures';
 
 const WATER_TILE = 73;
@@ -20,24 +21,7 @@ const GRASS = {
   b: [55, 56],
   br: 57,
 } as const;
-const DECORATIONS = [70, 71, 72, 49, 50, 87, 88] as const;
-
-type Landmark = readonly (readonly (number | null)[])[];
-
-const FORT: Landmark = [
-  [46, 30],
-  [null, null],
-];
-const BATTERY: Landmark = [
-  [null, null],
-  [47, 48],
-];
-const RUINS: Landmark = [
-  [90, null],
-  [null, 89],
-];
-const LANDMARKS = [FORT, BATTERY, RUINS] as const;
-const LANDMARK_MIN_SIZE = 4;
+const LARGE_ISLAND_SIZE = 4;
 
 const SHIMMER_ALPHA = 0.22;
 const SHIMMER_SPEED = { x: 9, y: 5 } as const;
@@ -108,39 +92,24 @@ function createLand(arena: Arena, islands: readonly TileRect[], textures: GameTe
 
   islands.forEach((island, index) => {
     const grassy = island.cols >= 3 && island.rows >= 3;
-    const landmark =
-      island.cols >= LANDMARK_MIN_SIZE && island.rows >= LANDMARK_MIN_SIZE
-        ? LANDMARKS[index % LANDMARKS.length]
-        : undefined;
-
     forEachTile(island, (col, row, edge) => {
-      const innerCol = col - island.col - 1;
-      const innerRow = row - island.row - 1;
       land.addChild(
         createTile(
           textures,
-          grassy ? pickGrassTile(edge, innerCol, innerRow) : SAND[edge],
+          grassy ? pickGrassTile(edge, col - island.col - 1, row - island.row - 1) : SAND[edge],
           col,
           row,
           size,
         ),
       );
-      if (edge !== 'c') return;
-
-      const structure = landmark?.[innerRow]?.[innerCol];
-      if (structure) {
-        land.addChild(createTile(textures, structure, col, row, size));
-        return;
-      }
-      if (hash(col, row) % 3 === 0) {
-        const decoration = DECORATIONS[hash(row, col) % DECORATIONS.length] ?? DECORATIONS[0];
-        const sprite = new Sprite(textures.tile(decoration));
-        sprite.anchor.set(0.5);
-        sprite.position.set((col + 0.5) * size, (row + 0.5) * size);
-        sprite.rotation = (hash(col * 7, row * 3) % 8) * (Math.PI / 4);
-        land.addChild(sprite);
-      }
     });
+    const large = island.cols >= LARGE_ISLAND_SIZE && island.rows >= LARGE_ISLAND_SIZE;
+    const scene = large
+      ? LARGE_ISLAND_SCENES[index % LARGE_ISLAND_SCENES.length]
+      : SMALL_ISLAND_SCENE;
+    for (const piece of scene ?? []) {
+      land.addChild(createPiece(textures, piece, island.col * size, island.row * size));
+    }
   });
 
   land.addChild(
@@ -149,6 +118,22 @@ function createLand(arena: Arena, islands: readonly TileRect[], textures: GameTe
       .stroke({ width: 4, color: 0x0b3954, alpha: 0.6 }),
   );
   return land;
+}
+
+function createPiece(
+  textures: GameTextures,
+  piece: ScenePiece,
+  originX: number,
+  originY: number,
+): Sprite {
+  return new Sprite({
+    texture: piece.texture(textures),
+    anchor: 0.5,
+    x: originX + piece.x,
+    y: originY + piece.y,
+    rotation: piece.rotation ?? 0,
+    scale: piece.scale ?? 1,
+  });
 }
 
 function createTile(
@@ -199,8 +184,4 @@ function pickGrassTile(edge: Edge, innerCol: number, innerRow: number): number {
     case 'c':
       return GRASS.c[rowParity]?.[colParity] ?? GRASS.c[0][0];
   }
-}
-
-function hash(a: number, b: number): number {
-  return Math.abs(((a * 73856093) ^ (b * 19349663)) >>> 0);
 }
