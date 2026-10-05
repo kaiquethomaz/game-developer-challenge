@@ -5,7 +5,8 @@ const BASE_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: './tests/e2e',
-  snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{testFilePath}/{arg}{ext}',
+  snapshotPathTemplate:
+    '{testDir}/__screenshots__/{platform}/{projectName}/{testFilePath}/{arg}{ext}',
   fullyParallel: true,
   workers: 2,
   timeout: 60_000,

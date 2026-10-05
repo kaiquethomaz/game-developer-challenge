@@ -11,7 +11,14 @@ const RESULT = {
   endedAt: '2026-09-08T19:36:00.000Z',
 };
 
+const BASELINE_PLATFORMS = new Set<string>(['win32', 'linux']);
+
 test.describe('visual regression', () => {
+  test.skip(
+    !BASELINE_PLATFORMS.has(process.platform),
+    'Baselines are versioned for Windows and Linux. Use npm run test:e2e:docker on other systems.',
+  );
+
   test('main menu', async ({ page }) => {
     await page.goto('/?latency=0');
     await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeFocused();
