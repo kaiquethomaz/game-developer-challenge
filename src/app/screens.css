@@ -530,3 +530,50 @@ kbd {
   height: 22px;
   accent-color: var(--color-gold-strong);
 }
+
+@media (max-height: 500px) {
+  .menu {
+    --panel-width: 560px;
+  }
+
+  .menu__title img {
+    width: 220px;
+  }
+
+  .menu .button-stack,
+  .result .button-stack {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .button {
+    min-width: 170px;
+    min-height: 46px;
+    font-size: 1rem;
+    border-width: 13px 30px;
+    border-image-width: 13px 30px;
+  }
+
+  .button > span {
+    margin: -13px -6px;
+  }
+
+  .button--small {
+    min-width: 140px;
+    min-height: 40px;
+    font-size: 0.85rem;
+  }
+
+  .result {
+    --panel-width: 560px;
+  }
+
+  .result .panel__title {
+    font-size: 1.5rem;
+  }
+
+  .result__score {
+    font-size: 2.6rem;
+  }
+}
