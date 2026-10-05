@@ -4,7 +4,9 @@ import type { SimulationEvent } from '../core/events';
 import { createRandom, type Random } from '../core/random';
 import type { Simulation } from '../core/simulation';
 import { createArenaView } from './ArenaView';
+import { DamageVignette } from './DamageVignette';
 import { EffectsLayer } from './EffectsLayer';
+import { FloatingTextLayer } from './FloatingTextLayer';
 import { HealthBarFills } from './HealthBar';
 import { SalvageLayer } from './SalvageLayer';
 import { ShipView } from './ShipView';
@@ -14,6 +16,9 @@ const BACKGROUND_COLOR = 0x1b2a3a;
 const MAX_PIXEL_RATIO = 2;
 const SHAKE_DECAY_PER_SECOND = 4;
 const REPAIR_COLOR = 0x7dff9b;
+const SCORE_COLOR = 0xffd34d;
+const DAMAGE_VIGNETTE_ALPHA = 0.55;
+const REDUCED_DAMAGE_VIGNETTE_ALPHA = 0.3;
 
 export interface RendererOptions {
   readonly seed: number;
@@ -35,6 +40,8 @@ export class GameRenderer {
   private readonly shipViews = new Map<number, ShipView>();
   private readonly projectileSprites: Sprite[] = [];
   private readonly random: Random;
+  private readonly floatingText: FloatingTextLayer;
+  private readonly vignette: DamageVignette;
   private readonly playerFills: HealthBarFills;
   private readonly enemyFills: HealthBarFills;
   private ringTexture: Texture | null = null;
@@ -51,6 +58,10 @@ export class GameRenderer {
     private readonly options: RendererOptions,
   ) {
     this.random = createRandom(options.seed);
+    this.floatingText = new FloatingTextLayer(!options.reducedMotion);
+    this.vignette = new DamageVignette(
+      options.reducedMotion ? REDUCED_DAMAGE_VIGNETTE_ALPHA : DAMAGE_VIGNETTE_ALPHA,
+    );
     this.playerFills = new HealthBarFills(textures.playerHealth);
     this.enemyFills = new HealthBarFills(textures.enemyHealth);
   }
@@ -102,6 +113,8 @@ export class GameRenderer {
     this.syncProjectiles();
     this.salvageLayer?.sync(this.simulation.salvage.items, dt);
     this.effects.update(dt);
+    this.floatingText.update(dt);
+    this.vignette.update(dt);
     this.updateShake(dt);
   }
 
@@ -116,6 +129,7 @@ export class GameRenderer {
     this.ringTexture?.destroy(true);
     this.puffTexture?.destroy(true);
     this.discTexture?.destroy(true);
+    this.vignette.destroy();
     this.app.destroy(
       { removeView: true },
       { children: true, texture: false, textureSource: false },
@@ -147,8 +161,9 @@ export class GameRenderer {
       this.projectileLayer,
       this.effects,
       this.overlayLayer,
+      this.floatingText,
     );
-    this.app.stage.addChild(this.world);
+    this.app.stage.addChild(this.world, this.vignette.sprite);
 
     this.app.renderer.on('resize', this.layout);
     this.layout();
@@ -158,6 +173,7 @@ export class GameRenderer {
   private readonly layout = (): void => {
     const { width, height } = this.app.screen;
     const { arena } = this.simulation;
+    this.vignette.resize(width, height);
     const scale = Math.min(width / arena.width, height / arena.height);
     this.world.scale.set(scale);
     this.world.position.set((width - arena.width * scale) / 2, (height - arena.height * scale) / 2);
@@ -236,9 +252,12 @@ export class GameRenderer {
         break;
       case 'destroyed':
         this.spawnDestruction(event.id, event.x, event.y);
+        if (event.cause === 'projectile')
+          this.floatingText.spawn('+1', event.x, event.y, SCORE_COLOR);
         break;
       case 'playerDamaged':
         this.addShake(10);
+        this.vignette.pulse();
         break;
       case 'islandBump':
         this.addShake(4);
@@ -248,6 +267,7 @@ export class GameRenderer {
         break;
       case 'repaired':
         this.spawnRepair(event.x, event.y);
+        this.floatingText.spawn(`+${event.amount}`, event.x, event.y, REPAIR_COLOR);
         break;
       case 'spawned':
       case 'scored':
