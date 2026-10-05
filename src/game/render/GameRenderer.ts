@@ -3,7 +3,7 @@ import type { Ship } from '../core/entities';
 import type { SimulationEvent } from '../core/events';
 import { createRandom, type Random } from '../core/random';
 import type { Simulation } from '../core/simulation';
-import { createArenaView } from './ArenaView';
+import { ArenaView } from './ArenaView';
 import { DamageVignette } from './DamageVignette';
 import { EffectsLayer } from './EffectsLayer';
 import { FloatingTextLayer } from './FloatingTextLayer';
@@ -48,6 +48,7 @@ export class GameRenderer {
   private puffTexture: Texture | null = null;
   private discTexture: Texture | null = null;
   private salvageLayer: SalvageLayer | null = null;
+  private arenaView: ArenaView | null = null;
   private shake = 0;
   private destroyed = false;
 
@@ -111,6 +112,7 @@ export class GameRenderer {
     for (const event of events) this.handleEvent(event);
     this.syncShips(dt);
     this.syncProjectiles();
+    this.arenaView?.update(dt);
     this.salvageLayer?.sync(this.simulation.salvage.items, dt);
     this.effects.update(dt);
     this.floatingText.update(dt);
@@ -154,8 +156,14 @@ export class GameRenderer {
       !this.options.reducedMotion,
     );
 
+    this.arenaView = new ArenaView(
+      arena,
+      this.simulation.config.arena.islands,
+      this.textures,
+      !this.options.reducedMotion,
+    );
     this.world.addChild(
-      createArenaView(arena, this.simulation.config.arena.islands, this.textures),
+      this.arenaView,
       this.salvageLayer,
       this.shipLayer,
       this.projectileLayer,

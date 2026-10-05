@@ -1,4 +1,4 @@
-import { Container, Graphics, Sprite } from 'pixi.js';
+import { Container, Graphics, Sprite, TilingSprite } from 'pixi.js';
 import type { TileRect } from '../config';
 import type { Arena } from '../core/arena';
 import type { GameTextures } from './textures';
@@ -22,62 +22,140 @@ const GRASS = {
 } as const;
 const DECORATIONS = [70, 71, 72, 49, 50, 87, 88] as const;
 
-export function createArenaView(
-  arena: Arena,
-  islands: readonly TileRect[],
-  textures: GameTextures,
-) {
-  const view = new Container({ label: 'arena' });
+type Landmark = readonly (readonly (number | null)[])[];
+
+const FORT: Landmark = [
+  [46, 30],
+  [null, null],
+];
+const BATTERY: Landmark = [
+  [null, null],
+  [47, 48],
+];
+const RUINS: Landmark = [
+  [90, null],
+  [null, 89],
+];
+const LANDMARKS = [FORT, BATTERY, RUINS] as const;
+const LANDMARK_MIN_SIZE = 4;
+
+const SHIMMER_ALPHA = 0.22;
+const SHIMMER_SPEED = { x: 9, y: 5 } as const;
+const SHIMMER_SCALE = 1.6;
+
+export class ArenaView extends Container {
+  private readonly shimmer: TilingSprite;
+
+  constructor(
+    arena: Arena,
+    islands: readonly TileRect[],
+    textures: GameTextures,
+    private readonly animate: boolean,
+  ) {
+    super({ label: 'arena' });
+    const water = createWater(arena, textures);
+    this.shimmer = new TilingSprite({
+      texture: textures.tile(WATER_TILE),
+      width: arena.width,
+      height: arena.height,
+      alpha: SHIMMER_ALPHA,
+      tileScale: { x: SHIMMER_SCALE, y: SHIMMER_SCALE },
+    });
+    const land = createLand(arena, islands, textures);
+    this.addChild(water, this.shimmer, land);
+  }
+
+  update(dt: number): void {
+    if (!this.animate) return;
+    this.shimmer.tilePosition.x += SHIMMER_SPEED.x * dt;
+    this.shimmer.tilePosition.y += SHIMMER_SPEED.y * dt;
+  }
+}
+
+function createWater(arena: Arena, textures: GameTextures): Container {
+  const water = new Container({ label: 'water' });
+  const size = arena.tileSize;
+  for (let row = 0; row < Math.round(arena.height / size); row += 1) {
+    for (let col = 0; col < Math.round(arena.width / size); col += 1) {
+      water.addChild(createTile(textures, WATER_TILE, col, row, size));
+    }
+  }
+  water.cacheAsTexture(true);
+  return water;
+}
+
+function createLand(arena: Arena, islands: readonly TileRect[], textures: GameTextures): Container {
+  const land = new Container({ label: 'land' });
   const size = arena.tileSize;
   const cols = Math.round(arena.width / size);
   const rows = Math.round(arena.height / size);
 
-  const place = (id: number, col: number, row: number): void => {
-    const sprite = new Sprite(textures.tile(id));
-    sprite.position.set(col * size, row * size);
-    sprite.width = size;
-    sprite.height = size;
-    view.addChild(sprite);
-  };
-
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) place(WATER_TILE, col, row);
-  }
-
   for (const island of islands) {
     forEachTile(expand(island), (col, row, edge) => {
       if (col >= 0 && row >= 0 && col < cols && row < rows) {
-        place(SHALLOW[edge], col, row);
+        land.addChild(createTile(textures, SHALLOW[edge], col, row, size));
       }
     });
   }
 
-  for (const island of islands) {
+  islands.forEach((island, index) => {
     const grassy = island.cols >= 3 && island.rows >= 3;
+    const landmark =
+      island.cols >= LANDMARK_MIN_SIZE && island.rows >= LANDMARK_MIN_SIZE
+        ? LANDMARKS[index % LANDMARKS.length]
+        : undefined;
+
     forEachTile(island, (col, row, edge) => {
-      place(
-        grassy ? pickGrassTile(edge, col - island.col - 1, row - island.row - 1) : SAND[edge],
-        col,
-        row,
+      const innerCol = col - island.col - 1;
+      const innerRow = row - island.row - 1;
+      land.addChild(
+        createTile(
+          textures,
+          grassy ? pickGrassTile(edge, innerCol, innerRow) : SAND[edge],
+          col,
+          row,
+          size,
+        ),
       );
-      if (edge === 'c' && hash(col, row) % 3 === 0) {
+      if (edge !== 'c') return;
+
+      const structure = landmark?.[innerRow]?.[innerCol];
+      if (structure) {
+        land.addChild(createTile(textures, structure, col, row, size));
+        return;
+      }
+      if (hash(col, row) % 3 === 0) {
         const decoration = DECORATIONS[hash(row, col) % DECORATIONS.length] ?? DECORATIONS[0];
         const sprite = new Sprite(textures.tile(decoration));
         sprite.anchor.set(0.5);
         sprite.position.set((col + 0.5) * size, (row + 0.5) * size);
         sprite.rotation = (hash(col * 7, row * 3) % 8) * (Math.PI / 4);
-        view.addChild(sprite);
+        land.addChild(sprite);
       }
     });
-  }
+  });
 
-  const border = new Graphics()
-    .rect(0, 0, arena.width, arena.height)
-    .stroke({ width: 4, color: 0x0b3954, alpha: 0.6 });
-  view.addChild(border);
+  land.addChild(
+    new Graphics()
+      .rect(0, 0, arena.width, arena.height)
+      .stroke({ width: 4, color: 0x0b3954, alpha: 0.6 }),
+  );
+  land.cacheAsTexture(true);
+  return land;
+}
 
-  view.cacheAsTexture(true);
-  return view;
+function createTile(
+  textures: GameTextures,
+  id: number,
+  col: number,
+  row: number,
+  size: number,
+): Sprite {
+  const sprite = new Sprite(textures.tile(id));
+  sprite.position.set(col * size, row * size);
+  sprite.width = size;
+  sprite.height = size;
+  return sprite;
 }
 
 type Edge = 'tl' | 't' | 'tr' | 'l' | 'c' | 'r' | 'bl' | 'b' | 'br';
