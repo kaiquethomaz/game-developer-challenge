@@ -59,13 +59,16 @@ None. The app is fully static. Everything that varies at runtime is controlled t
 
 ## Controls
 
-| Action                 | Keyboard           | Touch (landscape)         |
-| ---------------------- | ------------------ | ------------------------- |
-| Sail forward           | `W` or `↑`         | Forward button, left side |
-| Turn left / right      | `A` `D` or `←` `→` | Turn buttons, left side   |
-| Front cannon           | `Space` or `J`     | Center button, right side |
-| Left / right broadside | `Q` / `E`          | Side buttons, right side  |
-| Pause                  | `Esc` or `P`       | Pause button in the HUD   |
+| Action                 | Keyboard           | Touch (landscape)                    |
+| ---------------------- | ------------------ | ------------------------------------ |
+| Sail forward           | `W` or `↑`         | Forward button, left side            |
+| Turn left / right      | `A` `D` or `←` `→` | Turn buttons, left side              |
+| Front cannon           | `Space` or `J`     | Center button, right side            |
+| Left / right broadside | `Q` / `E`          | Side buttons, right side             |
+| Triple volley          | `R` or `K`         | ×3 button, above the right broadside |
+| Pause                  | `Esc` or `P`       | Pause button in the HUD              |
+
+The **triple volley** is a special shot: three balls fanned around the bow, on a 6 second reload shown by the ×3 gauge in the HUD. The front cannon itself always fires a single ball.
 
 Sink enemies to score. Sunk ships may leave floating **repair salvage** (a green glow with planks): sail over it with a damaged hull to repair 20 health. Salvage drops more often when your hull is at half health or less, and it sinks after 12 seconds.
 
