@@ -1,5 +1,7 @@
 # Pirate Battle
 
+[![CI](https://github.com/kaiquethomaz/game-developer-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/kaiquethomaz/game-developer-challenge/actions/workflows/ci.yml)
+
 A top-down naval shooter built with React, TypeScript and PixiJS. Sail between islands, sink chasers and shooters, and climb the captain's log before the timer runs out.
 
 **Live demo:** _add the Vercel URL here after the first deploy_
@@ -36,22 +38,24 @@ None. The app is fully static. Everything that varies at runtime is controlled t
 
 ## Commands
 
-| Command                   | Description                                                        |
-| ------------------------- | ------------------------------------------------------------------ |
-| `npm run dev`             | Vite dev server with React Strict Mode                             |
-| `npm run build`           | Type check and production build into `dist/`                       |
-| `npm run preview`         | Serve the production build on <http://localhost:4173>              |
-| `npm run lint`            | ESLint with type-aware rules                                       |
-| `npm run typecheck`       | TypeScript project references, no emit                             |
-| `npm run format`          | Prettier                                                           |
-| `npm test`                | Vitest unit tests for the simulation, storage, API and mocks       |
-| `npm run test:e2e`        | Playwright suite on desktop and mobile Chromium (builds first)     |
-| `npm run test:e2e:ui`     | Playwright UI mode                                                 |
-| `npm run test:e2e:update` | Regenerate the visual regression baselines                         |
-| `npm run test:e2e:report` | Open the last HTML report (traces are kept for failed tests)       |
-| `npm run profile`         | Production build plus a 3 minute profiling match and memory cycles |
-| `npm run profile:heap`    | Heap snapshot comparison by V8 node type across battle cycles      |
-| `npm run atlas`           | Regenerate the Pixi atlases from the provided sprite sheets        |
+| Command                          | Description                                                        |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `npm run dev`                    | Vite dev server with React Strict Mode                             |
+| `npm run build`                  | Type check and production build into `dist/`                       |
+| `npm run preview`                | Serve the production build on <http://localhost:4173>              |
+| `npm run lint`                   | ESLint with type-aware rules                                       |
+| `npm run typecheck`              | TypeScript project references, no emit                             |
+| `npm run format`                 | Prettier                                                           |
+| `npm test`                       | Vitest unit tests for the simulation, storage, API and mocks       |
+| `npm run test:e2e`               | Playwright suite on desktop and mobile Chromium (builds first)     |
+| `npm run test:e2e:ui`            | Playwright UI mode                                                 |
+| `npm run test:e2e:update`        | Regenerate the visual regression baselines                         |
+| `npm run test:e2e:docker`        | Run the Playwright suite in the official Linux container (any OS)  |
+| `npm run test:e2e:docker:update` | Regenerate the Linux baselines in that container                   |
+| `npm run test:e2e:report`        | Open the last HTML report (traces are kept for failed tests)       |
+| `npm run profile`                | Production build plus a 3 minute profiling match and memory cycles |
+| `npm run profile:heap`           | Heap snapshot comparison by V8 node type across battle cycles      |
+| `npm run atlas`                  | Regenerate the Pixi atlases from the provided sprite sheets        |
 
 ## Controls
 
@@ -63,11 +67,13 @@ None. The app is fully static. Everything that varies at runtime is controlled t
 | Left / right broadside | `Q` / `E`          | Side buttons, right side  |
 | Pause                  | `Esc` or `P`       | Pause button in the HUD   |
 
+Sink enemies to score. Sunk ships may leave floating **repair salvage** (a green glow with planks): sail over it with a damaged hull to repair 20 health. Salvage drops more often when your hull is at half health or less, and it sinks after 12 seconds.
+
 Keys can be held together, so you can sail, turn and fire at the same time. Touch buttons are multi-touch. Game keys are only captured while a battle is running; they are released in menus, dialogs and form fields. On phones the game is played in landscape; portrait shows a rotate hint.
 
 ## Gameplay configuration
 
-All balancing lives in a single typed object, `DEFAULT_GAME_CONFIG` in [`src/game/config.ts`](src/game/config.ts): arena and islands, spawn timing and distribution, health, movement and turn speeds, weapon damage, cooldowns, projectile speed, range and lifetime, and the shooter's attack and preferred range. Systems never hard-code gameplay numbers.
+All balancing lives in a single typed object, `DEFAULT_GAME_CONFIG` in [`src/game/config.ts`](src/game/config.ts): arena and islands, spawn timing and distribution, health, movement and turn speeds, weapon damage, cooldowns, projectile speed, range and lifetime, and the shooter's attack and preferred range. It also holds the enemy pressure ramp (the cap of enemies alive grows from 4 to 10 and shooters become more common as the match goes on) and the repair salvage drops. Systems never hard-code gameplay numbers.
 
 The Options screen exposes two values, validated and persisted in `localStorage`:
 
@@ -123,7 +129,11 @@ Determinism comes from an opt-in probe enabled with `?e2e=1`:
 
 The probe also exposes read-only state through `window.__pirateBattle.getState()`. Combat tests still press the real keyboard and touch controls, and every test starts from a fresh browser context.
 
-Visual baselines were generated on Windows. Font rendering differs between operating systems, so regenerate them with `npm run test:e2e:update` when running the suite on another platform.
+Font rendering differs between operating systems, so visual baselines are versioned per platform in `tests/e2e/__screenshots__/{win32,linux}`. Linux baselines come from the official Playwright Docker image, which CI uses too. On Windows, `npm run test:e2e` matches the baselines as is. On Linux and macOS, run `npm run test:e2e:docker`, which only needs Docker and reproduces CI exactly. A plain `npm run test:e2e` on macOS skips the three visual tests and runs the rest of the suite.
+
+### Continuous integration
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and pull request: lint, type checks, formatting, unit tests and the production build, then the full Playwright suite inside the Playwright container. The HTML report is uploaded as an artifact on every run, and traces and videos on failure.
 
 ## Performance
 

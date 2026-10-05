@@ -31,9 +31,9 @@ The continuous state of combat never lives in React. The session publishes a sma
 
 `Simulation` (`src/game/core/simulation.ts`) advances in fixed steps of 1/60 s. `FixedStepAccumulator` converts variable frame times into whole steps and clamps any frame to 250 ms, so movement, cooldowns, damage and spawns do not depend on the frame rate and a long stall cannot trigger a spiral of steps. Unit tests confirm that 30 fps and 144 fps produce the same trajectory within one step.
 
-Each step runs, in order: player movement and weapons, spawning, flow field refresh, enemy steering and fire, ship contacts, projectiles, removal of destroyed ships and the end of match check. The simulation returns early as soon as the match ends, so the final step cannot move, damage or score after the `ended` event.
+Each step runs, in order: player movement and weapons, spawning, flow field refresh, enemy steering and fire, ship contacts, projectiles, removal of destroyed ships, salvage pickup and the end of match check. The simulation returns early as soon as the match ends, so the final step cannot move, damage or score after the `ended` event.
 
-Randomness comes from a seeded `mulberry32` generator, so a seed reproduces spawn types, positions and every derived event. The renderer uses its own seeded generator for cosmetic effects so visuals never consume simulation randomness.
+Randomness comes from a seeded `mulberry32` generator, so a seed reproduces spawn types, positions and every derived event. Salvage drops use a second generator derived from the same seed, so loot never shifts the spawn sequence of a seed. The renderer uses its own seeded generator for cosmetic effects so visuals never consume simulation randomness.
 
 ### Pause
 
@@ -45,6 +45,8 @@ Pausing (manual, `blur` or `visibilitychange`) stops feeding the accumulator, re
 - Projectiles move with constant velocity, expire after their range or lifetime, stop at islands and arena edges, and apply damage once to the first opposing ship they overlap.
 - A chaser that touches the player deals contact damage and explodes without scoring. Only enemies destroyed by player projectiles add one point.
 - The match ends exactly at the configured duration or when health reaches zero, emitting a single `ended` event.
+- Enemy pressure ramps with match progress (elapsed time over duration). Spawns still happen on every configured interval, but the cap of enemies alive grows from 4 to 10 and the mix shifts from 60/40 to 40/60 chasers to shooters.
+- An enemy sunk by the player can leave **repair salvage** (35% chance, 70% while the hull is at or below half health, at most three afloat). Sailing over it with a damaged hull repairs 20 health, capped at the maximum; salvage left at full health stays afloat until it expires after 12 seconds. A rammed chaser never drops salvage.
 
 ## Collisions and navigation
 
@@ -68,6 +70,7 @@ Pausing (manual, `blur` or `visibilitychange`) stops feeding the accumulator, re
 - **Arena.** It is built once from tiles, with shallow water rings, grass or sand islands and deterministic decorations, then cached as a texture.
 - **Ship views.** Each one switches between four hull damage stages, shows flickering fires as health drops, flashes on hit and owns a health bar above the hull. Bar fills are cropped textures cached per 2.5% step and shared by every ship.
 - **Projectiles and effects.** Both use pooled sprites: muzzle smoke, hits, splashes, explosions, debris and sinking wrecks.
+- **Feedback layers.** Salvage, floating score and repair numbers (pooled `Text` objects) and a red edge vignette on player damage are separate layers. The vignette texture is drawn once on a 2D canvas and stretched to the screen; under reduced motion it is fainter and numbers do not rise.
 - **Screen shake.** It is disabled when the user prefers reduced motion.
 - **Canvas scaling.** The canvas follows its host with `resizeTo`, uses `autoDensity` and a resolution capped at 2, and letterboxes the fixed 1920×1088 world while preserving its proportions. Input is action-based (keys and DOM buttons), so it is unaffected by scaling.
 - **Teardown.** `GameSession.destroy` removes the visibility and blur listeners and the ticker callback, detaches the keyboard, releases inputs, destroys ship views, cached fill textures and generated textures, and destroys the Pixi application with its children while keeping the shared atlases. The profiling report checks that canvases, DOM nodes and heap return to their menu baseline after five battles.
@@ -141,20 +144,23 @@ MSW handlers (`src/mocks/handlers.ts`) run in the browser in development, in the
 
 - **Vitest.** It covers the pure core: fixed step, seeded random, arena collisions, flow field, movement, weapons, damage and scoring, enemy behaviors, spawning, match rules, option validation, the mock store and the client error policy.
 - **Playwright.** It drives the production build on desktop and mobile Chromium. Battles use `?e2e=1&clock=manual&seed=n`: the probe advances the simulation in fixed steps and reads state, while every action goes through the real keyboard or touch controls, the real collision code and the real renderer. Under the manual clock the render loop is capped at 20 fps to keep parallel software WebGL runs stable.
-- **Visual baselines.** They use a fixed locale, the UTC timezone and reduced motion.
+- **Visual baselines.** They use a fixed locale, the UTC timezone and reduced motion. Font rasterization differs between operating systems, so baselines are stored per platform (`__screenshots__/{win32,linux}`). Linux baselines are produced inside the official Playwright Docker image, the same image CI runs, so they match on any host; `npm run test:e2e:docker` runs the suite there from Windows, macOS or Linux.
+- **CI.** GitHub Actions runs lint, type checks, formatting, unit tests and the build, then the Playwright suite in the Playwright container, uploading the HTML report and failure traces as artifacts.
 
 ## Balancing decisions
 
-| Decision                                                        | Reason                                                                                                         |
-| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Front cannon: 25 damage, 0.45 s cooldown, 560 px range          | Precise and quick, rewards aiming.                                                                             |
-| Broadsides: three 20 damage balls, 1.2 s cooldown, 380 px range | Strong at close range but slow, so they reward positioning alongside enemies.                                  |
-| Chaser: 40 health                                               | Sunk by two front shots or one broadside.                                                                      |
-| Shooter: 60 health                                              | Needs three front shots, more attention than a chaser.                                                         |
-| Shooter cannon: 8 damage, 1.8 s cooldown                        | Lowered from 10 damage and 1.6 s after profiling showed a single shooter sank a stationary ship in about 18 s. |
-| Spawn distance 520 px                                           | Greater than the 420 px shooter attack range, so no enemy can deal damage on arrival.                          |
-| First two spawns: one chaser, one shooter                       | Guarantees both enemy types in every match. After that, spawns follow a 55/45 weighted distribution.           |
-| Maximum 12 enemies alive                                        | Protects performance at the shortest spawn interval. A spawn tick is skipped while the cap is reached.         |
+| Decision                                                         | Reason                                                                                                                                 |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Front cannon: 25 damage, 0.45 s cooldown, 560 px range           | Precise and quick, rewards aiming.                                                                                                     |
+| Broadsides: three 20 damage balls, 1.2 s cooldown, 380 px range  | Strong at close range but slow, so they reward positioning alongside enemies.                                                          |
+| Chaser: 40 health                                                | Sunk by two front shots or one broadside.                                                                                              |
+| Shooter: 60 health                                               | Needs three front shots, more attention than a chaser.                                                                                 |
+| Shooter cannon: 8 damage, 1.8 s cooldown                         | Lowered from 10 damage and 1.6 s after profiling showed a single shooter sank a stationary ship in about 18 s.                         |
+| Spawn distance 520 px                                            | Greater than the 420 px shooter attack range, so no enemy can deal damage on arrival.                                                  |
+| First two spawns: one chaser, one shooter                        | Guarantees both enemy types in every match. After that, spawns follow a weighted distribution.                                         |
+| Enemies alive capped from 4 to 10 over the match                 | Early battles are learnable; late battles are busy without becoming a wall of ships. A spawn tick is skipped while the cap is reached. |
+| Enemy mix from 60/40 to 40/60 chasers to shooters                | Late battles reward positioning and broadsides rather than only kiting chasers.                                                        |
+| Repair salvage: 20 health, 35% drop (70% at half health or less) | A way to recover by playing aggressively, which counters the rising pressure without making the player immune.                         |
 
 ## Limitations
 
@@ -162,5 +168,5 @@ MSW handlers (`src/mocks/handlers.ts`) run in the browser in development, in the
 - **Collision shapes.** Ships are circles and islands are rectangles; the rounded sand edges of the tiles are slightly inside the collision box.
 - **Pathing.** The flow field ignores other ships, so enemies can briefly bunch up before separation pushes them apart.
 - **Identity.** It is local to the browser (a generated player id). Clearing site data starts a new player history.
-- **Visual baselines.** They are platform-specific (generated on Windows).
+- **Visual baselines.** They exist for Windows and Linux. On macOS the visual tests skip; run the Docker script to check them.
 - **Profiling run.** It uses an invulnerable flag, because the scripted bot cannot survive three minutes on its own.
