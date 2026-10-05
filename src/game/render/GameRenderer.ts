@@ -19,6 +19,12 @@ const REPAIR_COLOR = 0x7dff9b;
 const SCORE_COLOR = 0xffd34d;
 const DAMAGE_VIGNETTE_ALPHA = 0.55;
 const REDUCED_DAMAGE_VIGNETTE_ALPHA = 0.3;
+const WAKE_INTERVAL_SECONDS = 0.07;
+const WAKE_MIN_SPEED = 25;
+const WAKE_STERN_RATIO = 1.15;
+const WAKE_COLOR = 0xf4fbff;
+const SHADOW_OFFSET = { x: 5, y: 7 } as const;
+const SHADOW_ALPHA = 0.28;
 
 export interface RendererOptions {
   readonly seed: number;
@@ -34,11 +40,15 @@ export interface RenderStats {
 export class GameRenderer {
   private readonly world = new Container({ label: 'world' });
   private readonly shipLayer = new Container({ label: 'ships' });
+  private readonly wakeLayer = new EffectsLayer({ label: 'wakes' });
+  private readonly projectileShadowLayer = new Container({ label: 'projectile-shadows' });
   private readonly projectileLayer = new Container({ label: 'projectiles' });
   private readonly effects = new EffectsLayer({ label: 'effects' });
   private readonly overlayLayer = new Container({ label: 'overlays' });
   private readonly shipViews = new Map<number, ShipView>();
   private readonly projectileSprites: Sprite[] = [];
+  private readonly projectileShadows: Sprite[] = [];
+  private readonly wakeTimers = new Map<number, number>();
   private readonly random: Random;
   private readonly floatingText: FloatingTextLayer;
   private readonly vignette: DamageVignette;
@@ -114,6 +124,7 @@ export class GameRenderer {
     this.syncProjectiles();
     this.arenaView?.update(dt);
     this.salvageLayer?.sync(this.simulation.salvage.items, dt);
+    this.wakeLayer.update(dt);
     this.effects.update(dt);
     this.floatingText.update(dt);
     this.vignette.update(dt);
@@ -165,7 +176,9 @@ export class GameRenderer {
     this.world.addChild(
       this.arenaView,
       this.salvageLayer,
+      this.wakeLayer,
       this.shipLayer,
+      this.projectileShadowLayer,
       this.projectileLayer,
       this.effects,
       this.overlayLayer,
@@ -197,6 +210,7 @@ export class GameRenderer {
       if (!seen.has(id)) {
         view.destroy();
         this.shipViews.delete(id);
+        this.wakeTimers.delete(id);
       }
     }
   }
@@ -213,6 +227,7 @@ export class GameRenderer {
         this.textures.fire,
         isPlayer ? this.textures.playerHealth : this.textures.enemyHealth,
         isPlayer ? this.playerFills : this.enemyFills,
+        this.options.reducedMotion ? null : ship.id,
       );
       this.shipLayer.addChild(view.body);
       this.overlayLayer.addChild(view.healthBar);
@@ -221,20 +236,63 @@ export class GameRenderer {
     view.sync(ship, dt);
     view.body.visible = ship.alive;
     view.healthBar.visible = ship.alive;
+    if (ship.alive) this.updateWake(ship, dt);
+  }
+
+  private updateWake(ship: Ship, dt: number): void {
+    const puff = this.puffTexture;
+    if (!puff || Math.abs(ship.speed) < WAKE_MIN_SPEED) return;
+
+    const timer = (this.wakeTimers.get(ship.id) ?? 0) - dt;
+    if (timer > 0) {
+      this.wakeTimers.set(ship.id, timer);
+      return;
+    }
+    this.wakeTimers.set(ship.id, timer + WAKE_INTERVAL_SECONDS);
+
+    const maxSpeed = this.simulation.config[ship.kind].maxSpeed;
+    const strength = Math.min(1, Math.abs(ship.speed) / maxSpeed);
+    const stern = ship.radius * WAKE_STERN_RATIO;
+    const jitter = this.random.range(-4, 4);
+    this.wakeLayer.spawn({
+      frames: [puff],
+      x: ship.position.x - Math.cos(ship.heading) * stern - Math.sin(ship.heading) * jitter,
+      y: ship.position.y - Math.sin(ship.heading) * stern + Math.cos(ship.heading) * jitter,
+      duration: 1.2,
+      scaleFrom: 0.45,
+      scaleTo: 1.5,
+      alphaFrom: 0.65 * strength,
+      tint: WAKE_COLOR,
+    });
   }
 
   private syncProjectiles(): void {
     const projectiles = this.simulation.projectiles.active;
     while (this.projectileSprites.length < projectiles.length) {
-      const sprite = new Sprite(this.textures.cannonBall);
-      sprite.anchor.set(0.5);
+      const sprite = new Sprite({ texture: this.textures.cannonBall, anchor: 0.5 });
+      const shadow = new Sprite({
+        texture: this.textures.cannonBall,
+        anchor: 0.5,
+        tint: 0x000000,
+        alpha: SHADOW_ALPHA,
+        scale: 0.85,
+      });
       this.projectileLayer.addChild(sprite);
+      this.projectileShadowLayer.addChild(shadow);
       this.projectileSprites.push(sprite);
+      this.projectileShadows.push(shadow);
     }
     for (const [index, sprite] of this.projectileSprites.entries()) {
       const projectile = projectiles[index];
+      const shadow = this.projectileShadows[index];
       sprite.visible = projectile !== undefined;
-      if (projectile) sprite.position.set(projectile.position.x, projectile.position.y);
+      if (shadow) shadow.visible = sprite.visible;
+      if (!projectile) continue;
+      sprite.position.set(projectile.position.x, projectile.position.y);
+      shadow?.position.set(
+        projectile.position.x + SHADOW_OFFSET.x,
+        projectile.position.y + SHADOW_OFFSET.y,
+      );
     }
   }
 

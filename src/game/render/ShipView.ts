@@ -8,6 +8,10 @@ const HEALTH_BAR_SCALE = 0.42;
 const HEALTH_BAR_GAP = 14;
 const HIT_FLASH_SECONDS = 0.12;
 const HIT_TINT = 0xff9a8a;
+const SWAY_RADIANS = 0.035;
+const SWAY_SPEED = 1.7;
+const BOB_SCALE = 0.018;
+const BOB_SPEED = 2.3;
 
 export function damageStage(ratio: number): number {
   if (ratio > 2 / 3) return 0;
@@ -23,12 +27,14 @@ export class ShipView {
   private stage = -1;
   private flashRemaining = 0;
   private flameClock = 0;
+  private swayClock = 0;
 
   constructor(
     private readonly stages: readonly Texture[],
     fireTextures: readonly Texture[],
     healthTextures: HealthBarTextures,
     fills: HealthBarFills,
+    private readonly swayPhase: number | null,
   ) {
     this.hull = new Sprite(stages[0]);
     this.hull.anchor.set(0.5);
@@ -53,6 +59,12 @@ export class ShipView {
   sync(ship: Ship, dt: number): void {
     this.body.position.set(ship.position.x, ship.position.y);
     this.body.rotation = ship.heading - SPRITE_FORWARD_ANGLE;
+    if (this.swayPhase !== null) {
+      this.swayClock += dt;
+      const phase = this.swayClock + this.swayPhase;
+      this.body.rotation += Math.sin(phase * SWAY_SPEED) * SWAY_RADIANS;
+      this.hull.scale.set(1 + Math.sin(phase * BOB_SPEED) * BOB_SCALE);
+    }
 
     const ratio = healthRatio(ship);
     const stage = damageStage(ratio);
