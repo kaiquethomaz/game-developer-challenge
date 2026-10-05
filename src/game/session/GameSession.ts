@@ -11,6 +11,8 @@ import { HudStore, type HudSnapshot, type PauseReason } from './HudStore';
 
 export type ClockMode = 'realtime' | 'manual';
 
+const MANUAL_CLOCK_MAX_FPS = 20;
+
 export interface MatchOutcome {
   readonly matchId: string;
   readonly seed: number;
@@ -76,6 +78,7 @@ export class GameSession {
     }
 
     this.renderer = renderer;
+    if (this.options.clock === 'manual') renderer.ticker.maxFPS = MANUAL_CLOCK_MAX_FPS;
     renderer.ticker.add(this.tick);
     this.keyboard.attach();
     this.keyboard.setEnabled(true);
