@@ -33,4 +33,12 @@ export type SimulationEvent =
   | { readonly type: 'scored'; readonly score: number }
   | { readonly type: 'playerDamaged'; readonly health: number }
   | { readonly type: 'islandBump'; readonly x: number; readonly y: number }
+  | { readonly type: 'salvageDropped'; readonly id: number; readonly x: number; readonly y: number }
+  | {
+      readonly type: 'repaired';
+      readonly amount: number;
+      readonly health: number;
+      readonly x: number;
+      readonly y: number;
+    }
   | { readonly type: 'ended'; readonly reason: EndReason };

@@ -68,6 +68,16 @@ export interface SpawnConfig {
   readonly distribution: EnemyDistribution;
 }
 
+export interface SalvageConfig {
+  readonly dropChance: number;
+  readonly lowHealthDropChance: number;
+  readonly lowHealthRatio: number;
+  readonly repairAmount: number;
+  readonly radius: number;
+  readonly lifetimeSeconds: number;
+  readonly maxActive: number;
+}
+
 export interface ArenaConfig {
   readonly tileSize: number;
   readonly cols: number;
@@ -87,6 +97,7 @@ export interface GameConfig {
   readonly maxFrameSeconds: number;
   readonly arena: ArenaConfig;
   readonly spawn: SpawnConfig;
+  readonly salvage: SalvageConfig;
   readonly navigation: NavigationConfig;
   readonly player: PlayerConfig;
   readonly chaser: ChaserConfig;
@@ -142,6 +153,15 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     clearance: 8,
     candidateAttempts: 48,
     distribution: { chaser: 0.55, shooter: 0.45 },
+  },
+  salvage: {
+    dropChance: 0.35,
+    lowHealthDropChance: 0.7,
+    lowHealthRatio: 0.5,
+    repairAmount: 20,
+    radius: 18,
+    lifetimeSeconds: 12,
+    maxActive: 3,
   },
   navigation: {
     refreshIntervalSeconds: 0.25,

@@ -1,19 +1,29 @@
 import type { GameConfig } from '../config';
 import { Arena } from './arena';
 import { separateShips, updateChaser, updateShooter, type SteeringContext } from './enemies';
-import type { EnemyKind, Faction, PlayerIntent, Ship, ShipKind, WeaponSlot } from './entities';
+import {
+  healthRatio,
+  type EnemyKind,
+  type Faction,
+  type PlayerIntent,
+  type Ship,
+  type ShipKind,
+  type WeaponSlot,
+} from './entities';
 import type { DestroyCause, EndReason, SimulationEvent } from './events';
 import { angleTo, distanceSquared, type Vec2 } from './math';
 import { moveShip } from './movement';
 import { FlowField } from './navigation';
 import { ProjectilePool } from './projectiles';
 import { createRandom, type Random } from './random';
+import { SalvageField } from './salvage';
 import { EnemySpawner, findSpawnPoint } from './spawner';
 import { fireBroadside, fireFront, tickCooldowns, type ShotOrigin } from './weapons';
 
 export type MatchStatus = 'running' | 'ended';
 
 const TIME_EPSILON = 1e-6;
+const SALVAGE_SEED_SALT = 0x5a1a6e;
 
 export interface SimulationState {
   elapsedSeconds: number;
@@ -32,6 +42,7 @@ export class Simulation {
   readonly arena: Arena;
   readonly state: SimulationState;
   readonly projectiles = new ProjectilePool();
+  readonly salvage: SalvageField;
   private events: SimulationEvent[] = [];
   private nextId = 1;
   private wasPlayerBlocked = false;
@@ -48,6 +59,7 @@ export class Simulation {
     this.arena = new Arena(config.arena);
     this.random = createRandom(seed);
     this.spawner = new EnemySpawner(config.spawn, this.random);
+    this.salvage = new SalvageField(config.salvage, createRandom(seed ^ SALVAGE_SEED_SALT));
     this.flowField = new FlowField(
       this.arena,
       Math.max(config.chaser.radius, config.shooter.radius) + config.navigation.clearanceMargin,
@@ -79,6 +91,7 @@ export class Simulation {
     if (this.isRunning()) this.updateProjectiles(dt);
     this.removeDestroyedEnemies();
     if (!this.isRunning()) return;
+    this.updateSalvage(dt);
 
     if (this.state.elapsedSeconds >= this.config.matchDurationSeconds - TIME_EPSILON) {
       this.state.elapsedSeconds = this.config.matchDurationSeconds;
@@ -302,6 +315,24 @@ export class Simulation {
     this.projectiles.releaseInactive();
   }
 
+  private updateSalvage(dt: number): void {
+    this.salvage.update(dt);
+    const { player } = this.state;
+    if (!player.alive || player.health >= player.maxHealth) return;
+
+    const collected = this.salvage.collect(player.position, player.radius);
+    if (!collected) return;
+    const before = player.health;
+    player.health = Math.min(player.maxHealth, player.health + this.config.salvage.repairAmount);
+    this.emit({
+      type: 'repaired',
+      amount: player.health - before,
+      health: player.health,
+      x: collected.position.x,
+      y: collected.position.y,
+    });
+  }
+
   private findProjectileTarget(faction: Faction, position: Vec2, radius: number): Ship | null {
     if (faction === 'enemy') {
       const { player } = this.state;
@@ -342,9 +373,17 @@ export class Simulation {
       x: enemy.position.x,
       y: enemy.position.y,
     });
-    if (cause === 'projectile') {
-      this.state.score += 1;
-      this.emit({ type: 'scored', score: this.state.score });
+    if (cause !== 'projectile') return;
+    this.state.score += 1;
+    this.emit({ type: 'scored', score: this.state.score });
+    const dropped = this.salvage.tryDrop(enemy.position, healthRatio(this.state.player));
+    if (dropped) {
+      this.emit({
+        type: 'salvageDropped',
+        id: dropped.id,
+        x: dropped.position.x,
+        y: dropped.position.y,
+      });
     }
   }
 
