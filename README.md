@@ -133,7 +133,7 @@ Font rendering differs between operating systems, so visual baselines are versio
 
 ### Continuous integration
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and pull request: lint, type checks, formatting, unit tests and the production build, then the full Playwright suite inside the Playwright container. The HTML report is uploaded as an artifact on every run, and traces and videos on failure.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and pull request: lint, type checks, formatting, unit tests and the production build, then the full Playwright suite inside the Playwright container. The HTML report is uploaded as an artifact on every run, and traces and videos on failure. The manual **Visual baselines** workflow regenerates the Linux baselines in the same container and publishes them as an artifact, for hosts where Docker is not available.
 
 ## Performance
 
