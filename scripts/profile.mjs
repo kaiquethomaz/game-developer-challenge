@@ -10,7 +10,7 @@ const outputDir = join(root, 'docs', 'performance');
 const PORT = 4180;
 const BASE_URL = `http://localhost:${PORT}`;
 const VIEWPORT = { width: 1920, height: 1080 };
-const MATCH = { matchDurationSeconds: 180, spawnIntervalSeconds: 3 };
+const MATCH = { matchDurationSeconds: 180, spawnIntervalSeconds: 3, difficulty: 'open' };
 const MEMORY_CYCLES = 5;
 const MEMORY_CYCLE_SECONDS = 20;
 const headed = process.argv.includes('--headed');
@@ -248,7 +248,7 @@ function toMarkdown(report) {
     `| GPU / WebGL renderer | ${match.renderer} |`,
     `| Viewport | ${VIEWPORT.width}x${VIEWPORT.height} at device pixel ratio 1 |`,
     `| Build | Production build served by \`vite preview\` |`,
-    `| Match | ${MATCH.matchDurationSeconds} s, enemy spawn every ${MATCH.spawnIntervalSeconds} s, seed 7 |`,
+    `| Match | ${MATCH.matchDurationSeconds} s, enemy spawn every ${MATCH.spawnIntervalSeconds} s, Open Sea difficulty, seed 7 |`,
     '',
     '## Three minute match',
     '',

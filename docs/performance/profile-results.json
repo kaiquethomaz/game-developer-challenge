@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-05T19:16:42.107Z",
+  "generatedAt": "2026-10-05T23:38:40.410Z",
   "environment": {
     "cpu": "AMD Ryzen 5 5500",
     "cores": 12,
@@ -10,10 +10,10 @@
   },
   "match": {
     "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2060 SUPER (0x00001F06) Direct3D11 vs_5_0 ps_5_0, D3D11)",
-    "wallSeconds": 180.2,
+    "wallSeconds": 180.3,
     "simulatedSeconds": 180,
-    "score": 54,
-    "frames": 10787,
+    "score": 56,
+    "frames": 10789,
     "averageFps": 60,
     "frameTimeMs": {
       "average": 16.67,
@@ -25,20 +25,20 @@
     "framesOver33ms": 0,
     "entities": {
       "enemies": {
-        "average": 1.6,
+        "average": 1.8,
         "max": 4
       },
       "projectiles": {
-        "average": 0.5,
-        "max": 3
+        "average": 0.6,
+        "max": 5
       },
       "effects": {
-        "average": 4.3,
-        "max": 13
+        "average": 44.7,
+        "max": 72
       },
       "total": {
-        "average": 7.4,
-        "max": 18
+        "average": 48.1,
+        "max": 78
       }
     },
     "timeline": [
@@ -46,1081 +46,1081 @@
         "t": 1,
         "enemies": 0,
         "projectiles": 0,
-        "effects": 0
+        "effects": 12
       },
       {
         "t": 2,
         "enemies": 1,
         "projectiles": 1,
-        "effects": 2
+        "effects": 26
       },
       {
         "t": 3,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 4
+        "effects": 36
       },
       {
         "t": 4,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 2
+        "effects": 29
       },
       {
         "t": 5,
         "enemies": 2,
-        "projectiles": 0,
-        "effects": 2
+        "projectiles": 1,
+        "effects": 25
       },
       {
         "t": 6,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 7
+        "effects": 42
       },
       {
         "t": 7,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 34
       },
       {
         "t": 8,
         "enemies": 2,
-        "projectiles": 3,
-        "effects": 4
+        "projectiles": 1,
+        "effects": 43
       },
       {
         "t": 9,
         "enemies": 1,
-        "projectiles": 2,
-        "effects": 10
+        "projectiles": 3,
+        "effects": 54
       },
       {
         "t": 10,
-        "enemies": 0,
+        "enemies": 1,
         "projectiles": 1,
-        "effects": 9
+        "effects": 24
       },
       {
         "t": 11,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 23
       },
       {
         "t": 12,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 34
       },
       {
         "t": 13,
         "enemies": 1,
-        "projectiles": 2,
-        "effects": 3
+        "projectiles": 1,
+        "effects": 36
       },
       {
         "t": 14,
         "enemies": 1,
         "projectiles": 1,
-        "effects": 7
+        "effects": 48
       },
       {
         "t": 15,
         "enemies": 1,
-        "projectiles": 0,
-        "effects": 2
+        "projectiles": 3,
+        "effects": 40
       },
       {
         "t": 16,
-        "enemies": 0,
-        "projectiles": 0,
-        "effects": 7
+        "enemies": 1,
+        "projectiles": 1,
+        "effects": 25
       },
       {
         "t": 17,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 25
       },
       {
         "t": 18,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 34
       },
       {
         "t": 19,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 34
       },
       {
         "t": 20,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 0
+        "effects": 42
       },
       {
         "t": 21,
-        "enemies": 1,
-        "projectiles": 1,
-        "effects": 12
+        "enemies": 2,
+        "projectiles": 2,
+        "effects": 52
       },
       {
         "t": 22,
         "enemies": 1,
         "projectiles": 1,
-        "effects": 2
+        "effects": 50
       },
       {
         "t": 23,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 10
+        "enemies": 2,
+        "projectiles": 1,
+        "effects": 44
       },
       {
         "t": 24,
         "enemies": 1,
-        "projectiles": 1,
-        "effects": 3
+        "projectiles": 0,
+        "effects": 59
       },
       {
         "t": 25,
-        "enemies": 0,
-        "projectiles": 0,
-        "effects": 1
+        "enemies": 1,
+        "projectiles": 1,
+        "effects": 40
       },
       {
         "t": 26,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 36
       },
       {
         "t": 27,
         "enemies": 1,
-        "projectiles": 1,
-        "effects": 2
+        "projectiles": 2,
+        "effects": 38
       },
       {
         "t": 28,
         "enemies": 1,
-        "projectiles": 0,
-        "effects": 2
+        "projectiles": 2,
+        "effects": 32
       },
       {
         "t": 29,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 9
+        "effects": 31
       },
       {
         "t": 30,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 1
+        "effects": 34
       },
       {
         "t": 31,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 34
       },
       {
         "t": 32,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 3
+        "effects": 42
       },
       {
         "t": 33,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 4
+        "effects": 50
       },
       {
         "t": 34,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 2
+        "effects": 51
       },
       {
         "t": 35,
         "enemies": 3,
-        "projectiles": 1,
-        "effects": 1
+        "projectiles": 0,
+        "effects": 58
       },
       {
         "t": 36,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 10
+        "enemies": 3,
+        "projectiles": 2,
+        "effects": 72
       },
       {
         "t": 37,
         "enemies": 2,
-        "projectiles": 2,
-        "effects": 3
+        "projectiles": 3,
+        "effects": 67
       },
       {
         "t": 38,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 11
+        "effects": 63
       },
       {
         "t": 39,
         "enemies": 2,
         "projectiles": 1,
-        "effects": 2
+        "effects": 52
       },
       {
         "t": 40,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 2
+        "enemies": 1,
+        "projectiles": 1,
+        "effects": 53
       },
       {
         "t": 41,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 9
+        "effects": 44
       },
       {
         "t": 42,
         "enemies": 2,
-        "projectiles": 1,
-        "effects": 2
+        "projectiles": 0,
+        "effects": 53
       },
       {
         "t": 43,
         "enemies": 2,
-        "projectiles": 2,
-        "effects": 3
+        "projectiles": 0,
+        "effects": 53
       },
       {
         "t": 44,
-        "enemies": 2,
-        "projectiles": 1,
-        "effects": 11
+        "enemies": 3,
+        "projectiles": 0,
+        "effects": 63
       },
       {
         "t": 45,
-        "enemies": 1,
+        "enemies": 3,
         "projectiles": 0,
-        "effects": 9
+        "effects": 61
       },
       {
         "t": 46,
-        "enemies": 0,
+        "enemies": 3,
         "projectiles": 0,
-        "effects": 10
+        "effects": 53
       },
       {
         "t": 47,
-        "enemies": 1,
+        "enemies": 4,
         "projectiles": 0,
-        "effects": 1
+        "effects": 56
       },
       {
         "t": 48,
-        "enemies": 1,
+        "enemies": 3,
         "projectiles": 0,
-        "effects": 0
+        "effects": 63
       },
       {
         "t": 49,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 0
+        "effects": 40
       },
       {
         "t": 50,
-        "enemies": 2,
-        "projectiles": 2,
-        "effects": 3
+        "enemies": 3,
+        "projectiles": 0,
+        "effects": 46
       },
       {
         "t": 51,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 8
+        "effects": 49
       },
       {
         "t": 52,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 2
+        "enemies": 2,
+        "projectiles": 1,
+        "effects": 49
       },
       {
         "t": 53,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 1
+        "effects": 53
       },
       {
         "t": 54,
         "enemies": 2,
         "projectiles": 1,
-        "effects": 4
+        "effects": 53
       },
       {
         "t": 55,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 13
+        "effects": 51
       },
       {
         "t": 56,
         "enemies": 2,
         "projectiles": 1,
-        "effects": 2
+        "effects": 45
       },
       {
         "t": 57,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 8
+        "effects": 50
       },
       {
         "t": 58,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 1
+        "effects": 36
       },
       {
         "t": 59,
-        "enemies": 2,
+        "enemies": 3,
         "projectiles": 0,
-        "effects": 0
+        "effects": 40
       },
       {
         "t": 60,
         "enemies": 2,
-        "projectiles": 1,
-        "effects": 1
+        "projectiles": 0,
+        "effects": 54
       },
       {
         "t": 61,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 1
+        "effects": 40
       },
       {
         "t": 62,
-        "enemies": 2,
+        "enemies": 3,
         "projectiles": 0,
-        "effects": 4
+        "effects": 42
       },
       {
         "t": 63,
         "enemies": 2,
-        "projectiles": 0,
-        "effects": 4
+        "projectiles": 1,
+        "effects": 44
       },
       {
         "t": 64,
         "enemies": 2,
-        "projectiles": 1,
-        "effects": 4
+        "projectiles": 0,
+        "effects": 41
       },
       {
         "t": 65,
-        "enemies": 2,
+        "enemies": 3,
         "projectiles": 0,
-        "effects": 10
+        "effects": 43
       },
       {
         "t": 66,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 2
+        "enemies": 3,
+        "projectiles": 3,
+        "effects": 43
       },
       {
         "t": 67,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 8
+        "effects": 35
       },
       {
         "t": 68,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 3
+        "effects": 37
       },
       {
         "t": 69,
         "enemies": 2,
-        "projectiles": 0,
-        "effects": 2
+        "projectiles": 1,
+        "effects": 53
       },
       {
         "t": 70,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 1,
-        "effects": 3
+        "effects": 56
       },
       {
         "t": 71,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 13
+        "effects": 42
       },
       {
         "t": 72,
-        "enemies": 1,
-        "projectiles": 1,
-        "effects": 10
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 55
       },
       {
         "t": 73,
-        "enemies": 1,
-        "projectiles": 1,
-        "effects": 2
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 53
       },
       {
         "t": 74,
-        "enemies": 1,
+        "enemies": 3,
         "projectiles": 1,
-        "effects": 8
+        "effects": 54
       },
       {
         "t": 75,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 0
+        "enemies": 2,
+        "projectiles": 1,
+        "effects": 61
       },
       {
         "t": 76,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 53
       },
       {
         "t": 77,
         "enemies": 2,
-        "projectiles": 1,
-        "effects": 2
+        "projectiles": 0,
+        "effects": 45
       },
       {
         "t": 78,
         "enemies": 2,
-        "projectiles": 2,
-        "effects": 5
+        "projectiles": 0,
+        "effects": 52
       },
       {
         "t": 79,
-        "enemies": 1,
-        "projectiles": 1,
-        "effects": 8
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 32
       },
       {
         "t": 80,
-        "enemies": 1,
-        "projectiles": 1,
-        "effects": 10
+        "enemies": 2,
+        "projectiles": 3,
+        "effects": 44
       },
       {
         "t": 81,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 1
+        "effects": 48
       },
       {
         "t": 82,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 40
       },
       {
         "t": 83,
         "enemies": 2,
-        "projectiles": 2,
-        "effects": 3
+        "projectiles": 0,
+        "effects": 44
       },
       {
         "t": 84,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 8
+        "effects": 44
       },
       {
         "t": 85,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 3
+        "enemies": 2,
+        "projectiles": 1,
+        "effects": 38
       },
       {
         "t": 86,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 1
+        "enemies": 3,
+        "projectiles": 2,
+        "effects": 38
       },
       {
         "t": 87,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 13
+        "effects": 44
       },
       {
         "t": 88,
-        "enemies": 1,
-        "projectiles": 1,
-        "effects": 4
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 36
       },
       {
         "t": 89,
-        "enemies": 1,
+        "enemies": 3,
         "projectiles": 1,
-        "effects": 9
+        "effects": 39
       },
       {
         "t": 90,
-        "enemies": 1,
-        "projectiles": 1,
-        "effects": 2
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 50
       },
       {
         "t": 91,
-        "enemies": 0,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 10
+        "effects": 38
       },
       {
         "t": 92,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 3
+        "enemies": 3,
+        "projectiles": 1,
+        "effects": 45
       },
       {
         "t": 93,
-        "enemies": 1,
+        "enemies": 3,
         "projectiles": 0,
-        "effects": 2
+        "effects": 40
       },
       {
         "t": 94,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 2
+        "effects": 50
       },
       {
         "t": 95,
         "enemies": 2,
-        "projectiles": 0,
-        "effects": 4
+        "projectiles": 2,
+        "effects": 46
       },
       {
         "t": 96,
         "enemies": 2,
         "projectiles": 1,
-        "effects": 3
+        "effects": 49
       },
       {
         "t": 97,
         "enemies": 1,
-        "projectiles": 0,
-        "effects": 10
+        "projectiles": 1,
+        "effects": 43
       },
       {
         "t": 98,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 6
+        "effects": 41
       },
       {
         "t": 99,
         "enemies": 1,
-        "projectiles": 0,
-        "effects": 1
+        "projectiles": 1,
+        "effects": 35
       },
       {
         "t": 100,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 2
+        "effects": 36
       },
       {
         "t": 101,
         "enemies": 2,
-        "projectiles": 0,
-        "effects": 2
+        "projectiles": 2,
+        "effects": 36
       },
       {
         "t": 102,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 1
+        "effects": 44
       },
       {
         "t": 103,
-        "enemies": 2,
-        "projectiles": 1,
-        "effects": 3
+        "enemies": 1,
+        "projectiles": 0,
+        "effects": 36
       },
       {
         "t": 104,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 13
+        "effects": 35
       },
       {
         "t": 105,
         "enemies": 2,
-        "projectiles": 2,
-        "effects": 5
+        "projectiles": 0,
+        "effects": 36
       },
       {
         "t": 106,
-        "enemies": 1,
-        "projectiles": 3,
-        "effects": 13
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 27
       },
       {
         "t": 107,
         "enemies": 2,
-        "projectiles": 2,
-        "effects": 6
+        "projectiles": 0,
+        "effects": 37
       },
       {
         "t": 108,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 10
+        "effects": 48
       },
       {
         "t": 109,
         "enemies": 1,
-        "projectiles": 1,
-        "effects": 1
+        "projectiles": 0,
+        "effects": 39
       },
       {
         "t": 110,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 2
+        "effects": 42
       },
       {
         "t": 111,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 2
+        "effects": 51
       },
       {
         "t": 112,
         "enemies": 2,
-        "projectiles": 0,
-        "effects": 8
+        "projectiles": 1,
+        "effects": 53
       },
       {
         "t": 113,
-        "enemies": 3,
-        "projectiles": 0,
-        "effects": 2
+        "enemies": 2,
+        "projectiles": 1,
+        "effects": 53
       },
       {
         "t": 114,
         "enemies": 2,
-        "projectiles": 0,
-        "effects": 1
+        "projectiles": 1,
+        "effects": 54
       },
       {
         "t": 115,
         "enemies": 2,
-        "projectiles": 1,
-        "effects": 2
+        "projectiles": 0,
+        "effects": 55
       },
       {
         "t": 116,
-        "enemies": 2,
-        "projectiles": 1,
-        "effects": 8
+        "enemies": 3,
+        "projectiles": 0,
+        "effects": 57
       },
       {
         "t": 117,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 8
+        "enemies": 3,
+        "projectiles": 1,
+        "effects": 56
       },
       {
         "t": 118,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 0
+        "enemies": 3,
+        "projectiles": 1,
+        "effects": 46
       },
       {
         "t": 119,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 0
+        "enemies": 3,
+        "projectiles": 2,
+        "effects": 56
       },
       {
         "t": 120,
         "enemies": 2,
-        "projectiles": 1,
-        "effects": 1
+        "projectiles": 0,
+        "effects": 63
       },
       {
         "t": 121,
-        "enemies": 1,
-        "projectiles": 1,
-        "effects": 9
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 54
       },
       {
         "t": 122,
-        "enemies": 2,
+        "enemies": 3,
         "projectiles": 0,
-        "effects": 2
+        "effects": 62
       },
       {
         "t": 123,
-        "enemies": 2,
-        "projectiles": 3,
-        "effects": 4
+        "enemies": 3,
+        "projectiles": 0,
+        "effects": 57
       },
       {
         "t": 124,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 10
+        "enemies": 3,
+        "projectiles": 1,
+        "effects": 53
       },
       {
         "t": 125,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 13
+        "enemies": 3,
+        "projectiles": 1,
+        "effects": 66
       },
       {
         "t": 126,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 1
+        "effects": 60
       },
       {
         "t": 127,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 2
+        "enemies": 2,
+        "projectiles": 2,
+        "effects": 54
       },
       {
         "t": 128,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 2
+        "effects": 62
       },
       {
         "t": 129,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 2
+        "enemies": 1,
+        "projectiles": 1,
+        "effects": 65
       },
       {
         "t": 130,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 4
+        "effects": 38
       },
       {
         "t": 131,
-        "enemies": 3,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 4
+        "effects": 44
       },
       {
         "t": 132,
-        "enemies": 3,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 5
+        "effects": 54
       },
       {
         "t": 133,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 11
+        "effects": 52
       },
       {
         "t": 134,
         "enemies": 3,
         "projectiles": 0,
-        "effects": 3
+        "effects": 57
       },
       {
         "t": 135,
         "enemies": 3,
         "projectiles": 0,
-        "effects": 3
+        "effects": 56
       },
       {
         "t": 136,
         "enemies": 3,
         "projectiles": 1,
-        "effects": 2
+        "effects": 59
       },
       {
         "t": 137,
-        "enemies": 4,
+        "enemies": 2,
         "projectiles": 1,
-        "effects": 4
+        "effects": 61
       },
       {
         "t": 138,
-        "enemies": 3,
-        "projectiles": 3,
-        "effects": 6
+        "enemies": 2,
+        "projectiles": 2,
+        "effects": 52
       },
       {
         "t": 139,
-        "enemies": 3,
-        "projectiles": 1,
-        "effects": 9
+        "enemies": 1,
+        "projectiles": 2,
+        "effects": 47
       },
       {
         "t": 140,
-        "enemies": 3,
-        "projectiles": 1,
-        "effects": 8
+        "enemies": 1,
+        "projectiles": 0,
+        "effects": 42
       },
       {
         "t": 141,
-        "enemies": 3,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 7
+        "effects": 35
       },
       {
         "t": 142,
-        "enemies": 2,
-        "projectiles": 1,
-        "effects": 12
+        "enemies": 1,
+        "projectiles": 0,
+        "effects": 36
       },
       {
         "t": 143,
-        "enemies": 3,
-        "projectiles": 1,
-        "effects": 1
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 41
       },
       {
         "t": 144,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 1
+        "enemies": 1,
+        "projectiles": 1,
+        "effects": 37
       },
       {
         "t": 145,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 1,
-        "effects": 4
+        "effects": 38
       },
       {
         "t": 146,
         "enemies": 2,
-        "projectiles": 0,
-        "effects": 1
+        "projectiles": 2,
+        "effects": 36
       },
       {
         "t": 147,
-        "enemies": 2,
-        "projectiles": 2,
-        "effects": 3
+        "enemies": 1,
+        "projectiles": 1,
+        "effects": 30
       },
       {
         "t": 148,
         "enemies": 1,
         "projectiles": 1,
-        "effects": 9
+        "effects": 38
       },
       {
         "t": 149,
         "enemies": 2,
-        "projectiles": 2,
-        "effects": 5
+        "projectiles": 1,
+        "effects": 47
       },
       {
         "t": 150,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 9
+        "enemies": 2,
+        "projectiles": 1,
+        "effects": 41
       },
       {
         "t": 151,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 32
       },
       {
         "t": 152,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 4
+        "effects": 42
       },
       {
         "t": 153,
         "enemies": 2,
-        "projectiles": 1,
-        "effects": 1
+        "projectiles": 0,
+        "effects": 44
       },
       {
         "t": 154,
         "enemies": 2,
-        "projectiles": 1,
-        "effects": 2
+        "projectiles": 0,
+        "effects": 36
       },
       {
         "t": 155,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 7
+        "enemies": 3,
+        "projectiles": 1,
+        "effects": 41
       },
       {
         "t": 156,
         "enemies": 2,
-        "projectiles": 3,
-        "effects": 2
+        "projectiles": 0,
+        "effects": 56
       },
       {
         "t": 157,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 9
+        "enemies": 2,
+        "projectiles": 1,
+        "effects": 48
       },
       {
         "t": 158,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 3
+        "enemies": 3,
+        "projectiles": 5,
+        "effects": 47
       },
       {
         "t": 159,
-        "enemies": 1,
-        "projectiles": 3,
-        "effects": 12
+        "enemies": 2,
+        "projectiles": 2,
+        "effects": 55
       },
       {
         "t": 160,
-        "enemies": 0,
-        "projectiles": 0,
-        "effects": 10
+        "enemies": 1,
+        "projectiles": 1,
+        "effects": 34
       },
       {
         "t": 161,
-        "enemies": 1,
-        "projectiles": 0,
-        "effects": 1
+        "enemies": 2,
+        "projectiles": 2,
+        "effects": 36
       },
       {
         "t": 162,
         "enemies": 1,
         "projectiles": 0,
-        "effects": 0
+        "effects": 36
       },
       {
         "t": 163,
         "enemies": 1,
-        "projectiles": 0,
-        "effects": 0
+        "projectiles": 2,
+        "effects": 37
       },
       {
         "t": 164,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 2
+        "enemies": 1,
+        "projectiles": 1,
+        "effects": 43
       },
       {
         "t": 165,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 2
+        "effects": 39
       },
       {
         "t": 166,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 2
+        "effects": 38
       },
       {
         "t": 167,
-        "enemies": 3,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 1
+        "effects": 44
       },
       {
         "t": 168,
         "enemies": 2,
         "projectiles": 0,
-        "effects": 12
+        "effects": 45
       },
       {
         "t": 169,
-        "enemies": 1,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 13
+        "effects": 36
       },
       {
         "t": 170,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 3
+        "enemies": 3,
+        "projectiles": 1,
+        "effects": 36
       },
       {
         "t": 171,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 2
+        "effects": 58
       },
       {
         "t": 172,
-        "enemies": 2,
-        "projectiles": 0,
-        "effects": 2
+        "enemies": 1,
+        "projectiles": 3,
+        "effects": 37
       },
       {
         "t": 173,
-        "enemies": 3,
-        "projectiles": 1,
-        "effects": 3
+        "enemies": 1,
+        "projectiles": 0,
+        "effects": 45
       },
       {
         "t": 174,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 5
+        "effects": 37
       },
       {
         "t": 175,
-        "enemies": 2,
+        "enemies": 1,
         "projectiles": 0,
-        "effects": 4
+        "effects": 36
       },
       {
         "t": 176,
-        "enemies": 3,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 2
+        "effects": 44
       },
       {
         "t": 177,
-        "enemies": 3,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 2
+        "effects": 43
       },
       {
         "t": 178,
-        "enemies": 3,
+        "enemies": 2,
         "projectiles": 0,
-        "effects": 1
+        "effects": 36
       },
       {
         "t": 179,
         "enemies": 3,
-        "projectiles": 0,
-        "effects": 9
+        "projectiles": 2,
+        "effects": 42
       },
       {
         "t": 180,
-        "enemies": 3,
-        "projectiles": 1,
-        "effects": 2
+        "enemies": 2,
+        "projectiles": 0,
+        "effects": 47
       }
     ],
     "consoleErrors": []
@@ -1129,72 +1129,72 @@
     "snapshots": [
       {
         "label": "menu (baseline)",
-        "heapMb": 4.08,
+        "heapMb": 4.09,
         "canvases": 0,
-        "domNodes": 68
+        "domNodes": 73
       },
       {
         "label": "cycle 1 in battle",
-        "heapMb": 11.62,
+        "heapMb": 12.36,
         "canvases": 1,
-        "domNodes": 46
+        "domNodes": 49
       },
       {
         "label": "cycle 1 back in menu",
-        "heapMb": 9.11,
+        "heapMb": 9.49,
         "canvases": 0,
-        "domNodes": 80
+        "domNodes": 85
       },
       {
         "label": "cycle 2 in battle",
-        "heapMb": 12.03,
+        "heapMb": 12.88,
         "canvases": 1,
-        "domNodes": 46
+        "domNodes": 49
       },
       {
         "label": "cycle 2 back in menu",
-        "heapMb": 9.45,
+        "heapMb": 9.89,
         "canvases": 0,
-        "domNodes": 80
+        "domNodes": 85
       },
       {
         "label": "cycle 3 in battle",
-        "heapMb": 12.33,
+        "heapMb": 13.12,
         "canvases": 1,
-        "domNodes": 46
+        "domNodes": 49
       },
       {
         "label": "cycle 3 back in menu",
-        "heapMb": 9.72,
+        "heapMb": 10.19,
         "canvases": 0,
-        "domNodes": 80
+        "domNodes": 85
       },
       {
         "label": "cycle 4 in battle",
-        "heapMb": 12.38,
+        "heapMb": 13.33,
         "canvases": 1,
-        "domNodes": 46
+        "domNodes": 49
       },
       {
         "label": "cycle 4 back in menu",
-        "heapMb": 9.87,
+        "heapMb": 10.27,
         "canvases": 0,
-        "domNodes": 80
+        "domNodes": 85
       },
       {
         "label": "cycle 5 in battle",
-        "heapMb": 12.61,
+        "heapMb": 13.43,
         "canvases": 1,
-        "domNodes": 46
+        "domNodes": 49
       },
       {
         "label": "cycle 5 back in menu",
-        "heapMb": 10.04,
+        "heapMb": 10.44,
         "canvases": 0,
-        "domNodes": 80
+        "domNodes": 85
       }
     ],
-    "menuHeapGrowthAfterFirstCycleMb": 0.93,
+    "menuHeapGrowthAfterFirstCycleMb": 0.95,
     "consoleErrors": []
   }
 }
