@@ -177,7 +177,8 @@ export class Simulation {
   }
 
   private updateSpawns(dt: number): void {
-    const kind = this.spawner.update(dt, this.state.enemies.length);
+    const progress = this.state.elapsedSeconds / this.config.matchDurationSeconds;
+    const kind = this.spawner.update(dt, this.state.enemies.length, progress);
     if (!kind) return;
 
     const { player, enemies } = this.state;

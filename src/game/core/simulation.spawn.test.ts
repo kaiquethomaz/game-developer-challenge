@@ -3,7 +3,9 @@ import { createMatchConfig, DEFAULT_GAME_CONFIG, DEFAULT_PLAYER_OPTIONS } from '
 import { createIdleIntent } from './entities';
 import type { SimulationEvent } from './events';
 import { distance } from './math';
+import { createRandom } from './random';
 import { Simulation } from './simulation';
+import { EnemySpawner } from './spawner';
 
 const STEP = DEFAULT_GAME_CONFIG.fixedStepSeconds;
 
@@ -72,5 +74,52 @@ describe('enemy spawning', () => {
     const a = collect(new Simulation(DEFAULT_GAME_CONFIG, 99), 15);
     const b = collect(new Simulation(DEFAULT_GAME_CONFIG, 99), 15);
     expect(a).toEqual(b);
+  });
+});
+
+describe('spawn pressure over the match', () => {
+  const { spawn } = DEFAULT_GAME_CONFIG;
+
+  it('raises the alive cap from the start to the end of the match', () => {
+    const spawner = new EnemySpawner(spawn, createRandom(1));
+    expect(spawner.maxAliveAt(0)).toBe(spawn.maxAlive.start);
+    expect(spawner.maxAliveAt(1)).toBe(spawn.maxAlive.end);
+    expect(spawner.maxAliveAt(0.5)).toBeGreaterThan(spawn.maxAlive.start);
+    expect(spawner.maxAliveAt(0.5)).toBeLessThan(spawn.maxAlive.end);
+    expect(spawner.maxAliveAt(2)).toBe(spawn.maxAlive.end);
+  });
+
+  it('never keeps more enemies alive than the current cap', () => {
+    const simulation = new Simulation(
+      createMatchConfig({ matchDurationSeconds: 60, spawnIntervalSeconds: 1 }),
+      5,
+    );
+    const idle = createIdleIntent();
+    for (let i = 0; i < Math.round(20 / STEP); i += 1) {
+      simulation.step(STEP, idle);
+      const progress = simulation.state.elapsedSeconds / 60;
+      const cap = Math.round(
+        spawn.maxAlive.start + (spawn.maxAlive.end - spawn.maxAlive.start) * progress,
+      );
+      expect(simulation.state.enemies.length).toBeLessThanOrEqual(cap);
+    }
+  });
+
+  it('shifts the enemy mix towards shooters late in the match', () => {
+    const count = (progress: number) => {
+      const spawner = new EnemySpawner(
+        { ...spawn, initialDelaySeconds: 0, intervalSeconds: 0 },
+        createRandom(3),
+      );
+      let shooters = 0;
+      for (let i = 0; i < 400; i += 1) {
+        const kind = spawner.update(0, 0, progress);
+        if (!kind) continue;
+        spawner.confirm(kind);
+        if (kind === 'shooter') shooters += 1;
+      }
+      return shooters;
+    };
+    expect(count(1)).toBeGreaterThan(count(0));
   });
 });

@@ -37,3 +37,7 @@ export function turnTowards(current: number, target: number, maxDelta: number): 
   const delta = wrapAngle(target - current);
   return wrapAngle(current + clamp(delta, -maxDelta, maxDelta));
 }
+
+export function lerp(from: number, to: number, t: number): number {
+  return from + (to - from) * t;
+}

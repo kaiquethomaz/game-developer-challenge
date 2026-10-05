@@ -58,14 +58,19 @@ export interface EnemyDistribution {
   readonly shooter: number;
 }
 
+export interface MatchRamp<T> {
+  readonly start: T;
+  readonly end: T;
+}
+
 export interface SpawnConfig {
   readonly intervalSeconds: number;
   readonly initialDelaySeconds: number;
-  readonly maxAlive: number;
+  readonly maxAlive: MatchRamp<number>;
   readonly minDistanceFromPlayer: number;
   readonly clearance: number;
   readonly candidateAttempts: number;
-  readonly distribution: EnemyDistribution;
+  readonly distribution: MatchRamp<EnemyDistribution>;
 }
 
 export interface SalvageConfig {
@@ -148,11 +153,14 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
   spawn: {
     intervalSeconds: DEFAULT_PLAYER_OPTIONS.spawnIntervalSeconds,
     initialDelaySeconds: 1.5,
-    maxAlive: 12,
+    maxAlive: { start: 4, end: 10 },
     minDistanceFromPlayer: 520,
     clearance: 8,
     candidateAttempts: 48,
-    distribution: { chaser: 0.55, shooter: 0.45 },
+    distribution: {
+      start: { chaser: 0.6, shooter: 0.4 },
+      end: { chaser: 0.4, shooter: 0.6 },
+    },
   },
   salvage: {
     dropChance: 0.35,

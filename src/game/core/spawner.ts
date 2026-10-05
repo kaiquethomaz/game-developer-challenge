@@ -1,7 +1,7 @@
 import type { SpawnConfig } from '../config';
 import type { Arena } from './arena';
 import type { EnemyKind, Ship } from './entities';
-import { distanceSquared, type Vec2 } from './math';
+import { clamp, distanceSquared, lerp, type Vec2 } from './math';
 import type { Random } from './random';
 
 export class EnemySpawner {
@@ -19,25 +19,33 @@ export class EnemySpawner {
     return this.spawned;
   }
 
-  update(dt: number, aliveCount: number): EnemyKind | null {
+  update(dt: number, aliveCount: number, matchProgress: number): EnemyKind | null {
     this.timer -= dt;
     if (this.timer > 0) return null;
 
     this.timer += this.config.intervalSeconds;
-    if (aliveCount >= this.config.maxAlive) return null;
-    return this.chooseKind();
+    if (aliveCount >= this.maxAliveAt(matchProgress)) return null;
+    return this.chooseKind(matchProgress);
+  }
+
+  maxAliveAt(matchProgress: number): number {
+    const { start, end } = this.config.maxAlive;
+    return Math.round(lerp(start, end, clamp(matchProgress, 0, 1)));
   }
 
   confirm(kind: EnemyKind): void {
     this.spawned[kind] += 1;
   }
 
-  private chooseKind(): EnemyKind {
+  private chooseKind(matchProgress: number): EnemyKind {
     const total = this.spawned.chaser + this.spawned.shooter;
     if (total === 1) {
       return this.spawned.chaser === 1 ? 'shooter' : 'chaser';
     }
-    const { chaser, shooter } = this.config.distribution;
+    const { start, end } = this.config.distribution;
+    const progress = clamp(matchProgress, 0, 1);
+    const chaser = lerp(start.chaser, end.chaser, progress);
+    const shooter = lerp(start.shooter, end.shooter, progress);
     return this.random.next() * (chaser + shooter) < chaser ? 'chaser' : 'shooter';
   }
 }
