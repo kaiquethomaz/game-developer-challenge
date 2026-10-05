@@ -19,7 +19,8 @@
     "test:e2e:update": "playwright test --update-snapshots",
     "test:e2e:report": "playwright show-report",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "atlas": "node scripts/build-atlases.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.1",
