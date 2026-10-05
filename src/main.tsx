@@ -3,7 +3,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createQueryClient } from './api/queryClient';
 import { App } from './App';
-import { startMockWorker } from './mocks/browser';
 import './styles/global.css';
 
 async function bootstrap(): Promise<void> {
@@ -13,6 +12,7 @@ async function bootstrap(): Promise<void> {
   }
 
   try {
+    const { startMockWorker } = await import('./mocks/browser');
     await startMockWorker();
   } catch (error) {
     console.warn('Mock API unavailable; ranking and history will report errors.', error);
