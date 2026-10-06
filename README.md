@@ -13,7 +13,7 @@ Sail between islands, sink chasers and shooters, salvage your hull and climb the
 ![MSW](https://img.shields.io/badge/MSW-2-ff6a33)
 ![Playwright](https://img.shields.io/badge/Playwright-E2E_%2B_visual-2ead33?logo=playwright&logoColor=white)
 
-**[Play the live demo](#deployment)** · [Architecture](ARCHITECTURE.md) · [Performance report](docs/performance/PROFILE.md) · [Test reports](docs/reports/README.md)
+**[Play the live demo](https://pirate-battle.pages.dev)** · [Architecture](ARCHITECTURE.md) · [Performance report](docs/performance/PROFILE.md) · [Test reports](docs/reports/README.md)
 
 <img src="docs/images/battle.jpg" alt="A battle in progress: the player's ship trails foam between islands with pirate camps while chasers and shooters close in" width="900">
 
@@ -205,7 +205,7 @@ Font rendering differs between operating systems, so visual baselines are versio
 
 ## Deployment
 
-**Live demo:** _add the Vercel URL here after the first deploy_
+**Live demo:** <https://pirate-battle.pages.dev>, deployed on Cloudflare Pages from `main`.
 
 The app is a static Vite build (build command `npm run build`, output directory `dist`) and runs on any static host:
 
