@@ -120,11 +120,13 @@ test.describe('match registration', () => {
     await page.goto('/?scenario=success&latency=400');
     await page.getByRole('button', { name: 'Main menu' }).click();
     await page.getByRole('button', { name: 'Match history' }).click();
-    const retry = page.getByRole('button', { name: 'Retry now' });
-    if (await retry.isVisible()) {
-      await retry.click();
-      await retry.click({ force: true }).catch(() => undefined);
-    }
+    await page.evaluate(() => {
+      const retry = [...document.querySelectorAll('button')].find(
+        (button) => button.textContent.trim() === 'Retry now',
+      );
+      retry?.click();
+      retry?.click();
+    });
     const rows = page
       .getByRole('tabpanel')
       .getByRole('row')
