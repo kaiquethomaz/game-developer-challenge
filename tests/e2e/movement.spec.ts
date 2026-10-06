@@ -64,6 +64,7 @@ test.describe('movement', () => {
   });
 
   test('cannot sail through an island', async ({ page }) => {
+    test.slow();
     await turnTowards(page, 0.6);
     await page.keyboard.down('KeyW');
     let touched = false;

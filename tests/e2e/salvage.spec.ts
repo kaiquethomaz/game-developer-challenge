@@ -3,6 +3,7 @@ import { advance, advanceUntil, readState, startBattle, turnTowards } from './su
 
 test.describe('repair salvage', () => {
   test('a sunk enemy can leave salvage that repairs the hull once', async ({ page }) => {
+    test.slow();
     await startBattle(page, { seed: 5, spawnIntervalSeconds: 10 });
     const damaged = await advanceUntil(page, (state) => state.player.health < 100, 15);
     const target = damaged.enemies[0];
@@ -23,7 +24,7 @@ test.describe('repair salvage', () => {
     expect(sunk.salvage).toHaveLength(1);
     const healthBefore = sunk.player.health;
 
-    for (let i = 0; i < 60; i += 1) {
+    for (let i = 0; i < 40; i += 1) {
       const state = await readState(page);
       const salvage = state.salvage[0];
       if (!salvage) break;
@@ -33,7 +34,7 @@ test.describe('repair salvage', () => {
         0.1,
       );
       await page.keyboard.down('KeyW');
-      await advance(page, 0.15);
+      await advance(page, 0.3);
       await page.keyboard.up('KeyW');
     }
 

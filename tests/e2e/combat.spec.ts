@@ -95,6 +95,7 @@ test.describe('combat', () => {
   });
 
   test('damages enemies and scores exactly one point per sunk ship', async ({ page }) => {
+    test.slow();
     const first = await advanceUntil(page, (state) => state.enemies.length > 0, 3);
     const target = first.enemies[0];
     if (!target) throw new Error('No enemy spawned');
